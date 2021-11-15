@@ -6,8 +6,9 @@ designed to add values per sheet for coordinates given by row and column (one ba
 Excel template. Currently, it only supports adding values in a forward iteration manner to a sheet, i.e. your data
 should be sorted by row and column number.
 
-It uses [kuba-- zip](https://github.com/kuba--/zip "zip"), [pugixml](https://github.com/zeux/pugixml "pugixml")
-and [{fmt}](https://github.com/fmtlib/fmt "fmt") as libraries.
+It depends on [pugixml](https://github.com/zeux/pugixml "pugixml")
+and [{fmt}](https://github.com/fmtlib/fmt "fmt") as libraries. Internally it uses
+uses [kuba-- zip](https://github.com/kuba--/zip "zip") as zip library which is included in the repository.
 
 > **WARNING**: This is not an Excel library as it only handles a very specific use case. It is not even supporting strings, hence it is not even loading the shared string table inside the Excel archive.
 
@@ -21,6 +22,8 @@ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DUSE_CONAN=ON -DCMAKE_INS
 make
 make install
 ```
+
+By default it uses the conan cmake integration to provide the required packages.
 
 API
 ---
@@ -58,6 +61,8 @@ int main() {
         sheetData.setValue(cell.row_, cell.column_, cell.value_);
     // Save the sheet
     sheet.save();
+    
+    return 0;
 }
 ```
 
@@ -77,9 +82,11 @@ for selected sheets. The output of the benchmark looks like
 [info] Wrote excel file EBA_2021_EU-wide_stress_test_Templates_v0_filled.xlsx in 2.194 seconds.
 ```
 
-The above timings were produced running using gcc 11.2 on an Intel(R) Core(TM) i7-7820X CPU @ 3.60GHz.
+The above timings were produced using gcc 11.2 running on an Intel(R) Core(TM) i7-7820X CPU @ 3.60GHz.
 
-The examples are using [spdlog](https://github.com/gabime/spdlog) for logging purposes.
+The examples are using [spdlog](https://github.com/gabime/spdlog) for logging purposes
+and [nlohman json](https://github.com/nlohmann/json) in order to load the target cell JSON file required for the
+EBABenchmark example.
 
 Notes
 -----
