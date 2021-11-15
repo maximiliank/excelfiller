@@ -1,0 +1,2 @@
+@echo off
+cmd /c ""@EXCEL_COMMAND_WIN@" -oice "@EBA_TEMPLATE_NAME_XLSB_WIN@" "@EBA_TEMPLATE_NAME_XLSX_WIN@""

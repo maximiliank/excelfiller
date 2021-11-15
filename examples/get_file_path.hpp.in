@@ -1,0 +1,56 @@
+#pragma once
+
+#include <filesystem>
+#include <fmt/format.h>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+
+namespace TestData::detail {
+    enum class FilePathMode {
+        File,
+        Directory
+    };
+    template<FilePathMode mode, typename... Ts>
+    std::string getFilePath(Ts&&... paths)
+    {
+        static constexpr std::string_view path = "@TEST_DATA_DIRECTORY@";
+        static_assert(sizeof...(Ts) == 0 ||
+                              ((std::is_same_v<typename std::decay_t<Ts>, std::string> ||
+                                std::is_same_v<typename std::decay_t<Ts>, std::string_view> ||
+                                std::is_same_v<typename std::decay_t<Ts>, const char*>) ||
+                               ...),
+                      "T must be a basic_string, string_view or const char *");
+        namespace fs = std::filesystem;
+        const auto filePath = (fs::path{path} / ... / std::forward<Ts>(paths));
+        auto filePathStr = filePath.string();
+        if (fs::exists(filePath))
+        {
+            if constexpr (mode == FilePathMode::File)
+            {
+                if (!fs::is_regular_file(filePath))
+                    throw std::runtime_error(fmt::format("Path {} is not a file", filePathStr));
+            }
+            else if constexpr (mode == FilePathMode::Directory)
+            {
+                if (!fs::is_directory(filePath))
+                    throw std::runtime_error(fmt::format("Path {} is not a directory", filePathStr));
+            }
+            return filePathStr;
+        }
+        throw std::runtime_error(fmt::format("Path {} does not exist", filePathStr));
+    }
+}// namespace TestData::detail
+
+namespace TestData {
+    template<typename... Ts>
+    std::string getFilePath(Ts&&... paths)
+    {
+        return detail::getFilePath<detail::FilePathMode::File>(std::forward<Ts>(paths)...);
+    }
+    template<typename... Ts>
+    std::string getDirectoryPath(Ts&&... paths)
+    {
+        return detail::getFilePath<detail::FilePathMode::Directory>(std::forward<Ts>(paths)...);
+    }
+}// namespace TestData
