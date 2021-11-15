@@ -76,10 +76,10 @@ step takes quite a time with `LibreOffice`. When it is run, random samples are c
 for selected sheets. The output of the benchmark looks like
 
 ```shell
-[info] Wrote 92173 cells to sheet CSV_CR_SCEN in 1.411 seconds.
-[info] Wrote 36612 cells to sheet CSV_CR_REA in 0.3131 seconds.
-[info] Wrote 22200 cells to sheet CSV_CR_COVID19 in 0.4175 seconds.
-[info] Wrote excel file EBA_2021_EU-wide_stress_test_Templates_v0_filled.xlsx in 2.194 seconds.
+[info] Wrote 92173 cells to sheet CSV_CR_SCEN in 1.242 seconds.
+[info] Wrote 36612 cells to sheet CSV_CR_REA in 0.2763 seconds.
+[info] Wrote 22200 cells to sheet CSV_CR_COVID19 in 0.3601 seconds.
+[info] Wrote excel file EBA_2021_EU-wide_stress_test_Templates_v0_filled.xlsx in 1.920 seconds.
 ```
 
 The above timings were produced using gcc 11.2 running on an Intel(R) Core(TM) i7-7820X CPU @ 3.60GHz.
