@@ -88,6 +88,56 @@ The examples are using [spdlog](https://github.com/gabime/spdlog) for logging pu
 and [nlohman json](https://github.com/nlohmann/json) in order to load the target cell JSON file required for the
 EBABenchmark example.
 
+Usage in other projects
+-----------------------
+
+If you have `ExcelFiller` installed on your current system you can find it using
+```cmake
+set(ExcelFiller_DIR <path_to_excelfiller>/lib/cmake/ExcelFiller)
+find_package(ExcelFiller CONFIG REQUIRED)
+```
+
+If you want to set it up using `ExternalProject_Add` you can do it as follows:
+```cmake
+include(ExternalProject)
+include(GNUInstallDirs)
+set(ExcelFiller_ROOT ${CMAKE_BINARY_DIR}/excelfiller)
+set(ExcelFiller_LIB_DIR ${ExcelFiller_ROOT}/bin/${CMAKE_INSTALL_LIBDIR})
+set(ExcelFiller_INCLUDE_DIR ${ExcelFiller_ROOT}/bin/include)
+if (NOT IS_DIRECTORY ${ExcelFiller_INCLUDE_DIR})
+    file(MAKE_DIRECTORY ${ExcelFiller_INCLUDE_DIR})
+endif ()
+message(STATUS "DIR ${ExcelFiller_ROOT}")
+ExternalProject_Add(excel_filler_external
+        PREFIX ${ExcelFiller_ROOT}
+        GIT_REPOSITORY https://github.com/maximiliank/excelfiller.git
+        GIT_TAG v0.0.1
+        BINARY_DIR ${ExcelFiller_ROOT}/src/excelfiller-build
+        SOURCE_DIR ${ExcelFiller_ROOT}/src/excelfiller
+        INSTALL_DIR ${ExcelFiller_ROOT}/bin
+        CMAKE_ARGS "${CMAKE_ARGS};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DBUILD_EXAMPLES=OFF;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-DUSE_CONAN=OFF;-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}"
+        BUILD_BYPRODUCTS ${ExcelFiller_LIB_DIR}/libExcelFiller.a ${ExcelFiller_LIB_DIR}/libzip.a
+        )
+add_library(ExcelFiller::ExcelFillerLib STATIC IMPORTED)
+set_target_properties(ExcelFiller::ExcelFillerLib PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${ExcelFiller_INCLUDE_DIR}
+        IMPORTED_LOCATION ${ExcelFiller_LIB_DIR}/libExcelFiller.a
+        )
+
+add_library(ExcelFiller::ExcelFillerZip STATIC IMPORTED)
+set_target_properties(ExcelFiller::ExcelFillerZip PROPERTIES
+        IMPORTED_LOCATION ${ExcelFiller_LIB_DIR}/libzip.a
+        )
+add_library(ExcelFiller::ExcelFiller INTERFACE IMPORTED)
+add_dependencies(ExcelFiller::ExcelFiller excel_filler_external)
+
+set_property(TARGET ExcelFiller::ExcelFiller PROPERTY
+        INTERFACE_LINK_LIBRARIES ExcelFiller::ExcelFillerLib ExcelFiller::ExcelFillerZip pugixml::pugixml fmt::fmt)
+```
+
+Note that this currently only works if you provide a `Findpugixml.cmake` which is in your `${CMAKE_BINARY_DIR}`, e.g. when created by `conan`.
+In the future `ExcelFiller` itself should contain a find script for `pugixml`.
+
 Notes
 -----
 
