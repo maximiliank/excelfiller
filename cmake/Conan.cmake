@@ -34,6 +34,9 @@ macro(run_conan)
             ${CONAN_EXTRA_OPTIONS}
             GENERATORS ${CONAN_CMAKE_GENERATOR})
 
+    if (NOT CMAKE_CONFIGURATION_TYPES)
+        set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
+    endif()
     foreach (TYPE ${CMAKE_CONFIGURATION_TYPES})
         conan_cmake_autodetect(settings BUILD_TYPE ${TYPE})
         conan_cmake_install(PATH_OR_REFERENCE .
