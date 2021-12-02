@@ -97,46 +97,44 @@ set(ExcelFiller_DIR <path_to_excelfiller>/lib/cmake/ExcelFiller)
 find_package(ExcelFiller CONFIG REQUIRED)
 ```
 
-If you want to set it up using `ExternalProject_Add` you can do it as follows:
+It is also possible to include the required subdirectories using `FetchContent_Declare`. This ensures that the same compiler flags are used.
+You should only include the subfolder containing the source of `ExcelFiller` and if your project does not include the [kuba-- zip](https://github.com/kuba--/zip "zip") library you should also include the zip folder.
+You can create a file `cmake/ExcelFiller.cmake` with the following content:
 ```cmake
-include(ExternalProject)
-include(GNUInstallDirs)
-set(ExcelFiller_ROOT ${CMAKE_BINARY_DIR}/excelfiller)
-set(ExcelFiller_LIB_DIR ${ExcelFiller_ROOT}/bin/${CMAKE_INSTALL_LIBDIR})
-set(ExcelFiller_INCLUDE_DIR ${ExcelFiller_ROOT}/bin/include)
-if (NOT IS_DIRECTORY ${ExcelFiller_INCLUDE_DIR})
-    file(MAKE_DIRECTORY ${ExcelFiller_INCLUDE_DIR})
-endif ()
-message(STATUS "DIR ${ExcelFiller_ROOT}")
-ExternalProject_Add(excel_filler_external
-        PREFIX ${ExcelFiller_ROOT}
+include(FetchContent)
+FetchContent_Declare(
+        excel_filler
         GIT_REPOSITORY https://github.com/maximiliank/excelfiller.git
-        GIT_TAG v0.0.1
-        BINARY_DIR ${ExcelFiller_ROOT}/src/excelfiller-build
-        SOURCE_DIR ${ExcelFiller_ROOT}/src/excelfiller
-        INSTALL_DIR ${ExcelFiller_ROOT}/bin
-        CMAKE_ARGS "${CMAKE_ARGS};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DBUILD_EXAMPLES=OFF;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-DUSE_CONAN=OFF;-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}"
-        BUILD_BYPRODUCTS ${ExcelFiller_LIB_DIR}/libExcelFiller.a ${ExcelFiller_LIB_DIR}/libzip.a
-        )
-add_library(ExcelFiller::ExcelFillerLib STATIC IMPORTED)
-set_target_properties(ExcelFiller::ExcelFillerLib PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES ${ExcelFiller_INCLUDE_DIR}
-        IMPORTED_LOCATION ${ExcelFiller_LIB_DIR}/libExcelFiller.a
-        )
+        GIT_TAG origin/main
+        UPDATE_DISCONNECTED   ON
+)
 
-add_library(ExcelFiller::ExcelFillerZip STATIC IMPORTED)
-set_target_properties(ExcelFiller::ExcelFillerZip PROPERTIES
-        IMPORTED_LOCATION ${ExcelFiller_LIB_DIR}/libzip.a
-        )
-add_library(ExcelFiller::ExcelFiller INTERFACE IMPORTED)
-add_dependencies(ExcelFiller::ExcelFiller excel_filler_external)
+FetchContent_GetProperties(excel_filler)
+if (NOT excel_filler_POPULATED)
+    FetchContent_Populate(excel_filler)
+endif ()
 
-set_property(TARGET ExcelFiller::ExcelFiller PROPERTY
-        INTERFACE_LINK_LIBRARIES ExcelFiller::ExcelFillerLib ExcelFiller::ExcelFillerZip pugixml::pugixml fmt::fmt)
+if (NOT TARGET project_options)
+    add_library(project_options INTERFACE)
+endif ()
+if (NOT TARGET project_warnings)
+    add_library(project_warnings INTERFACE)
+endif ()
+if (NOT TARGET zip::zip)
+    add_subdirectory(${excel_filler_SOURCE_DIR}/Source/zip ${excel_filler_BINARY_DIR}_zip)
+endif ()
 ```
 
-Note that this currently only works if you provide a `Findpugixml.cmake` which is in your `${CMAKE_BINARY_DIR}`, e.g. when created by `conan`.
-In the future `ExcelFiller` itself should contain a find script for `pugixml`.
+and then include it in your `CMakeLists.txt`
+```cmake
+include(cmake/ExcelFiller.cmake)
+add_subdirectory(${excel_filler_SOURCE_DIR}/Source/ExcelFiller ${excel_filler_BINARY_DIR}_excelfiller)
+```
+
+Note that if you follow the same `CMake` setup your `INTERFACE` targets `project_options` and `project_warnings` are also applied to `ExcelFiller`.
+If you do not have these targets they are defined as empty interfaces.
+
+The finding of `fmt` and `pugixml` has to be done on the consuming project in this case.
 
 Notes
 -----

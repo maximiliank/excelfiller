@@ -48,3 +48,5 @@ if (USE_CONAN)
             DESTINATION lib/cmake/${TARGET_NAME}
             )
 endif()
+
+add_library(${TARGET_NAME}::${TARGET_NAME} ALIAS ${TARGET_NAME})
