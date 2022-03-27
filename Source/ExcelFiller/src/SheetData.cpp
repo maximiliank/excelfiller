@@ -1,6 +1,7 @@
 #include "ExcelFiller/SheetData.h"
 #include <fmt/format.h>
 #include <string_view>
+#include <vector>
 
 ExcelFiller::SheetData::SheetData(pugi::xml_node data) : data_(data), rowProxy_(data_.first_child())
 {}
