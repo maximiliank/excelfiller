@@ -11,6 +11,8 @@ namespace ExcelFiller {
         explicit ColumnProxy(pugi::xml_node column, std::size_t row);
 
         void setValue(std::size_t column, double value);
+
+        void setValue(std::size_t column, const std::string& value);
     };
 
     class RowProxy {
@@ -27,6 +29,8 @@ namespace ExcelFiller {
 
         void setValue(std::size_t column, double value);
 
+        void setValue(std::size_t column, const std::string& value);
+
         void setRow(std::size_t row);
     };
 
@@ -39,6 +43,9 @@ namespace ExcelFiller {
         explicit SheetData(pugi::xml_node data);
 
         void setValue(std::size_t row, std::size_t column, double value);
+
+        void setValue(std::size_t row, std::size_t column, const std::string& value);
+
         [[nodiscard]] const pugi::xml_node& getData() const;
     };
 }// namespace ExcelFiller

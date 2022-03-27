@@ -59,6 +59,7 @@ int main()
 
             for (const auto& cell : values)
                 sheetData.setValue(cell.row_, cell.column_, cell.value_);
+            sheetData.setValue(1, 1, "TEST");
             sheet.save();
 
             spdlog::info("Wrote {} cells to sheet {} in {:.4} seconds.", values.size(), sheetName,
