@@ -1,41 +1,30 @@
-macro(run_conan)
-    # Download automatically, you can also just copy the conan.cmake file
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
-    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
-
-    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-    if (isMultiConfig)
-        SET(CONAN_CMAKE_GENERATOR cmake_find_package_multi)
-    else ()
-        SET(CONAN_CMAKE_GENERATOR cmake_find_package)
-    endif ()
-
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-      message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-      file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-                    "${CMAKE_BINARY_DIR}/conan.cmake"
-                    TLS_VERIFY ON)
+foreach(file conan_provider)
+  set(DESTINATION_FILE ${CMAKE_BINARY_DIR}/${file}.cmake)
+  if(NOT EXISTS "${DESTINATION_FILE}")
+    message(
+      STATUS
+        "Downloading ${file}.cmake from https://raw.githubusercontent.com/conan-io/cmake-conan/develop2"
+    )
+    file(
+      DOWNLOAD
+      "https://raw.githubusercontent.com/conan-io/cmake-conan/develop2/${file}.cmake"
+      "${DESTINATION_FILE}"
+      STATUS DOWNLOAD_STATUS
+      TLS_VERIFY ON)
+    # Separate the returned status code, and error message.
+    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+    list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
+    # Check if download was successful.
+    if(${STATUS_CODE} EQUAL 0)
+      message(STATUS "Download completed successfully ${DESTINATION_FILE}")
+    else()
+      # Exit CMake if the download failed, printing the error message.
+      file(REMOVE "${DESTINATION_FILE}")
+      message(
+        FATAL_ERROR
+          "Error occurred during download of ${file}.cmake: ${ERROR_MESSAGE}")
     endif()
+  endif()
+endforeach()
 
-    include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-    conan_cmake_configure(
-            REQUIRES
-            ${CONAN_EXTRA_REQUIRES}
-            fmt/7.1.3
-            pugixml/1.11
-            OPTIONS
-            ${CONAN_EXTRA_OPTIONS}
-            GENERATORS ${CONAN_CMAKE_GENERATOR})
-
-    if (NOT CMAKE_CONFIGURATION_TYPES)
-        set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
-    endif()
-    foreach (TYPE ${CMAKE_CONFIGURATION_TYPES})
-        conan_cmake_autodetect(settings BUILD_TYPE ${TYPE})
-        conan_cmake_install(PATH_OR_REFERENCE .
-                BUILD missing
-                REMOTE conancenter
-                SETTINGS ${settings})
-    endforeach ()
-endmacro()
+set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES ${CMAKE_BINARY_DIR}/conan_provider.cmake)
