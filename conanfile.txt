@@ -3,6 +3,7 @@ fmt/11.0.2
 spdlog/1.15.0
 pugixml/1.14
 nlohmann_json/3.11.3
+kuba-zip/0.3.2
 
 [layout]
 cmake_layout

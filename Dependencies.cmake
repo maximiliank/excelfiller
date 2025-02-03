@@ -13,6 +13,10 @@ function(excelfiller_setup_dependencies)
     find_package(pugixml REQUIRED)
   endif()
 
+  if(NOT TARGET zip::zip)
+    find_package(zip REQUIRED)
+  endif()
+
   if(BUILD_EXAMPLES)
     if(NOT TARGET spdlog::spdlog)
       find_package(spdlog REQUIRED)

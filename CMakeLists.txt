@@ -25,8 +25,7 @@ set_project_warnings(project_warnings)
 
 excelfiller_setup_dependencies()
 
-# https://github.com/kuba--/zip
-add_subdirectory(Source/zip)
+# https://github.com/kuba--/zip add_subdirectory(Source/zip)
 add_subdirectory(Source/ExcelFiller)
 
 if(BUILD_EXAMPLES)
