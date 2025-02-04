@@ -50,7 +50,7 @@ int main()
         std::filesystem::copy(filenameOriginal, targetFilename,
                               std::filesystem::copy_options::overwrite_existing);
 
-        ExcelFiller::XlsxWorkbook wb(targetFilename);
+        ExcelFiller::XlsxWorkbook wb(targetFilename, true);
         for (const auto& [sheetName, values] : data)
         {
             spdlog::stopwatch sw;
@@ -65,6 +65,7 @@ int main()
             spdlog::info("Wrote {} cells to sheet {} in {:.4} seconds.", values.size(), sheetName,
                          sw);
         }
+        wb.writeSharedStringTable();
         spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
         return 0;
     }

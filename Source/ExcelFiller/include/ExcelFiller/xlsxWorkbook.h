@@ -12,8 +12,10 @@ namespace ExcelFiller {
     public:
         using ZipXMLHelper::writeXMLFile;
 
-        explicit XlsxWorkbook(const std::string& filename);
+        explicit XlsxWorkbook(const std::string& filename, bool loadSharedStrings);
 
         [[nodiscard]] XlsxWorksheet getWorksheet(const std::string& name);
+
+        void writeSharedStringTable();
     };
 }// namespace ExcelFiller

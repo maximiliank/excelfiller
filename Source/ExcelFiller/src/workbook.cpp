@@ -3,7 +3,9 @@
 #include <fmt/format.h>
 #include <ostream>
 
-ExcelFiller::Workbook::Workbook(pugi::xml_node workbook, ExcelFiller::SheetRelations&& relations)
+ExcelFiller::Workbook::Workbook(pugi::xml_node workbook, ExcelFiller::SheetRelations&& relations,
+                                std::optional<SharedStringTable>&& sharedStringTable)
+    : sharedStringTable_(std::move(sharedStringTable))
 {
     for (auto sheet : workbook.child("sheets").children())
     {
@@ -37,4 +39,12 @@ const std::string& ExcelFiller::Workbook::getSheetXmlName(const std::string& nam
         return it->second.getTarget();
     else
         throw std::runtime_error(fmt::format("Could not find sheet with name {}", name));
+}
+
+void ExcelFiller::Workbook::writeSharedStringTable()
+{
+    if (sharedStringTable_.has_value())
+    {
+        sharedStringTable_->writeSharedStringTable();
+    }
 }
