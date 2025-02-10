@@ -9,7 +9,7 @@ ExcelFiller::XlsxWorkbook::XlsxWorkbook(const std::string& filename, const bool 
           auto relations = SheetRelations(doc.child("Relationships"));
           doc = ZipXMLHelper::loadXMLFile("xl/workbook.xml");
           std::optional<SharedStringTable> sharedStringTable;
-          if (loadSharedStrings)
+          if (loadSharedStrings && ZipXMLHelper::hasFile("xl/sharedStrings.xml"))
           {
               sharedStringTable.emplace(ZipXMLHelper::loadXMLFile("xl/sharedStrings.xml"), *this);
           }
@@ -27,4 +27,10 @@ ExcelFiller::XlsxWorksheet ExcelFiller::XlsxWorkbook::getWorksheet(const std::st
 void ExcelFiller::XlsxWorkbook::writeSharedStringTable()
 {
     workbook_.writeSharedStringTable();
+}
+
+[[nodiscard]] std::optional<ExcelFiller::SharedStringTable>&
+ExcelFiller::XlsxWorkbook::getSharedStringTable()
+{
+    return workbook_.getSharedStringTable();
 }

@@ -48,3 +48,8 @@ void ExcelFiller::Workbook::writeSharedStringTable()
         sharedStringTable_->writeSharedStringTable();
     }
 }
+
+std::optional<ExcelFiller::SharedStringTable>& ExcelFiller::Workbook::getSharedStringTable()
+{
+    return sharedStringTable_;
+}

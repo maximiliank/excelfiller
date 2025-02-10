@@ -19,6 +19,7 @@ namespace ExcelFiller {
         ~ZipXMLHelper();
 
     protected:
+        [[nodiscard]] bool hasFile(const std::string& file) const;
         [[nodiscard]] pugi::xml_document loadXMLFile(const std::string& file);
 
         void writeXMLFile(const std::string& file, const pugi::xml_document& doc);

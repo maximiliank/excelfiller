@@ -23,6 +23,8 @@ namespace ExcelFiller {
         [[nodiscard]] const std::string& getSheetXmlName(const std::string& name) const;
 
         void writeSharedStringTable();
+
+        [[nodiscard]] std::optional<SharedStringTable>& getSharedStringTable();
     };
 
     std::ostream& operator<<(std::ostream& os, const Workbook& wb);

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "ExcelFiller/SharedStringTable.h"
+#include <optional>
 #include <pugixml.hpp>
-
 namespace ExcelFiller {
     class ColumnProxy {
         pugi::xml_node currentColumn_;
@@ -38,9 +39,11 @@ namespace ExcelFiller {
     class SheetData {
         pugi::xml_node data_;
         RowProxy rowProxy_;
+        std::optional<SharedStringTable>& sharedStringTable_;
 
     public:
-        explicit SheetData(pugi::xml_node data);
+        explicit SheetData(pugi::xml_node data,
+                           std::optional<SharedStringTable>& sharedStringTable);
 
         void setValue(std::size_t row, std::size_t column, double value);
 

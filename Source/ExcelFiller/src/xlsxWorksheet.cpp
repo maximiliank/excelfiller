@@ -14,7 +14,8 @@ ExcelFiller::XlsxWorksheet::XlsxWorksheet(pugi::xml_document&& doc, XlsxWorkbook
 }
 ExcelFiller::SheetData ExcelFiller::XlsxWorksheet::getSheetData()
 {
-    return ExcelFiller::SheetData(doc_.child("worksheet").child("sheetData"));
+    return ExcelFiller::SheetData(doc_.child("worksheet").child("sheetData"),
+                                  workbook_.getSharedStringTable());
 }
 void ExcelFiller::XlsxWorksheet::save()
 {

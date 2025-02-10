@@ -3,7 +3,9 @@
 #include <string_view>
 #include <vector>
 
-ExcelFiller::SheetData::SheetData(pugi::xml_node data) : data_(data), rowProxy_(data_.first_child())
+ExcelFiller::SheetData::SheetData(pugi::xml_node data,
+                                  std::optional<SharedStringTable>& sharedStringTable)
+    : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)
 {}
 
 void ExcelFiller::SheetData::setValue(const std::size_t row, const std::size_t column,
@@ -67,8 +69,8 @@ namespace ExcelFiller {
             }
             return str;
         };
-    }
-}
+    }// namespace
+}// namespace ExcelFiller
 void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value)
 {
     const auto cellRef = toBase26(column) + rowStr_;

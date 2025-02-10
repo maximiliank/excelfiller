@@ -48,7 +48,7 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
     }
 }
 
-std::size_t ExcelFiller::SharedStringTable::getSharedStringIndex(const std::string& item)
+std::size_t ExcelFiller::SharedStringTable::getSharedStringIndex(const std::string_view item)
 {
     if (auto itExisting = existingSharedStrings_.find(item);
         itExisting != existingSharedStrings_.end())
