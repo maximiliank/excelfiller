@@ -8,12 +8,6 @@ ExcelFiller::SheetData::SheetData(pugi::xml_node data,
     : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)
 {}
 
-void ExcelFiller::SheetData::setValue(const std::size_t row, const std::size_t column,
-                                      const double value)
-{
-    rowProxy_.setRow(row);
-    rowProxy_.setValue(column, value);
-}
 const pugi::xml_node& ExcelFiller::SheetData::getData() const
 {
     return data_;
@@ -41,14 +35,6 @@ std::size_t ExcelFiller::RowProxy::getRowNumber(const pugi::xml_node row)
     return row.attribute("r").as_ullong();
 }
 
-void ExcelFiller::RowProxy::setValue(std::size_t column, double value)
-{
-    columnProxy_.setValue(column, value);
-}
-void ExcelFiller::RowProxy::setValue(std::size_t column, const std::string& value)
-{
-    columnProxy_.setValue(column, value);
-}
 void ExcelFiller::RowProxy::setColumnProxy()
 {
     columnProxy_ = ColumnProxy(currentRow_.first_child(), row_);
@@ -69,9 +55,23 @@ namespace ExcelFiller {
             }
             return str;
         };
+
+        pugi::xml_node getValueNode(pugi::xml_node item)
+        {
+            auto node = item.find_child(
+                    [](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
+
+            if (node.empty())
+            {
+                node = item.append_child("v");
+            }
+            return node;
+        }
     }// namespace
 }// namespace ExcelFiller
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value)
+void ExcelFiller::ColumnProxy::setValue(
+        std::size_t column, double value,
+        [[maybe_unused]] std::optional<SharedStringTable>& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
@@ -98,13 +98,8 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value)
     valueNode.text() = value;
 }
 
-void ExcelFiller::SheetData::setValue(std::size_t row, std::size_t column, const std::string& value)
-{
-    RowProxy rowProxy(data_.first_child());
-    rowProxy.setRow(row);
-    rowProxy.setValue(column, value);
-}
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string& value)
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_view value,
+                                        std::optional<SharedStringTable>& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
@@ -115,15 +110,21 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string& v
     }
 
     if (auto attr = currentColumn_.attribute("t"); !attr.empty())
-        attr.set_value("inlineStr");
+        attr.set_value("s");
     else
-        currentColumn_.append_attribute("t").set_value("inlineStr");
+        currentColumn_.append_attribute("t").set_value("s");
 
-    currentColumn_.remove_children();
-    auto is = currentColumn_.append_child("is");
-    auto node = is.append_child("t");
+    auto valueNode = getValueNode(currentColumn_);
 
-    static std::vector<std::string> stringCache_;
-    const auto& valueCache = stringCache_.emplace_back(value);
-    node.text() = valueCache.c_str();
+    const auto idx = sharedStringTable->getSharedStringIndex(value);
+    valueNode.text() = idx;
+}
+
+
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, const CellVariants value,
+                                        std::optional<SharedStringTable>& sharedStringTable)
+{
+    std::visit([this, column,
+                &sharedStringTable](auto&& arg) { setValue(column, arg, sharedStringTable); },
+               value);
 }
