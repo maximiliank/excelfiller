@@ -113,7 +113,7 @@ int main()
         std::filesystem::copy(filenameOriginal, targetFilename,
                               std::filesystem::copy_options::overwrite_existing);
 
-        ExcelFiller::XlsxWorkbook wb(targetFilename, true);
+        ExcelFiller::XlsxWorkbook wb(targetFilename);
         writeSheet(wb, "Sheet1", createRandomValues(2, 2));
         writeSheet(wb, "Sheet2", createStrings(2, 2));
         writeSheet(wb, "Sheet3", createVariants(2, 2));

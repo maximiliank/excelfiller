@@ -69,7 +69,7 @@ void writeExcel(const std::string& filenameOriginal, const std::string& targetFi
     std::filesystem::copy(filenameOriginal, targetFilename,
                           std::filesystem::copy_options::overwrite_existing);
 
-    ExcelFiller::XlsxWorkbook wb(targetFilename, false);
+    ExcelFiller::XlsxWorkbook wb(targetFilename);
 
     for (const auto& [sheetName, cells] : targets)
     {

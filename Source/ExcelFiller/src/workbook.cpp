@@ -4,7 +4,7 @@
 #include <ostream>
 
 ExcelFiller::Workbook::Workbook(pugi::xml_node workbook, ExcelFiller::SheetRelations&& relations,
-                                std::optional<SharedStringTable>&& sharedStringTable)
+                                SharedStringTable&& sharedStringTable)
     : sharedStringTable_(std::move(sharedStringTable))
 {
     for (auto sheet : workbook.child("sheets").children())
@@ -43,13 +43,10 @@ const std::string& ExcelFiller::Workbook::getSheetXmlName(const std::string& nam
 
 void ExcelFiller::Workbook::writeSharedStringTable()
 {
-    if (sharedStringTable_.has_value())
-    {
-        sharedStringTable_->writeSharedStringTable();
-    }
+    sharedStringTable_.writeSharedStringTable();
 }
 
-std::optional<ExcelFiller::SharedStringTable>& ExcelFiller::Workbook::getSharedStringTable()
+ExcelFiller::SharedStringTable& ExcelFiller::Workbook::getSharedStringTable()
 {
     return sharedStringTable_;
 }

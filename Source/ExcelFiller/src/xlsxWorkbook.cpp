@@ -3,16 +3,16 @@
 #include <fmt/format.h>
 #include <pugixml.hpp>
 
-ExcelFiller::XlsxWorkbook::XlsxWorkbook(const std::string& filename, const bool loadSharedStrings)
-    : ZipXMLHelper(filename), workbook_([this, loadSharedStrings]() {
+ExcelFiller::XlsxWorkbook::XlsxWorkbook(const std::string& filename)
+    : ZipXMLHelper(filename), workbook_([this]() {
           auto doc = ZipXMLHelper::loadXMLFile("xl/_rels/workbook.xml.rels");
           auto relations = SheetRelations(doc.child("Relationships"));
           doc = ZipXMLHelper::loadXMLFile("xl/workbook.xml");
-          std::optional<SharedStringTable> sharedStringTable;
-          if (loadSharedStrings && ZipXMLHelper::hasFile("xl/sharedStrings.xml"))
-          {
-              sharedStringTable.emplace(ZipXMLHelper::loadXMLFile("xl/sharedStrings.xml"), *this);
-          }
+          SharedStringTable sharedStringTable =
+                  ZipXMLHelper::hasFile("xl/sharedStrings.xml")
+                          ? SharedStringTable(ZipXMLHelper::loadXMLFile("xl/sharedStrings.xml"),
+                                              *this)
+                          : SharedStringTable(*this);
           return Workbook(doc.child("workbook"), std::move(relations),
                           std::move(sharedStringTable));
       }())
@@ -29,8 +29,7 @@ void ExcelFiller::XlsxWorkbook::writeSharedStringTable()
     workbook_.writeSharedStringTable();
 }
 
-[[nodiscard]] std::optional<ExcelFiller::SharedStringTable>&
-ExcelFiller::XlsxWorkbook::getSharedStringTable()
+[[nodiscard]] ExcelFiller::SharedStringTable& ExcelFiller::XlsxWorkbook::getSharedStringTable()
 {
     return workbook_.getSharedStringTable();
 }

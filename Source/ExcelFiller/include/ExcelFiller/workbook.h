@@ -3,7 +3,6 @@
 #include "SheetRelation.h"
 #include "hashmap.hpp"
 #include <iosfwd>
-#include <optional>
 #include <pugixml.hpp>
 #include <string>
 namespace ExcelFiller {
@@ -12,19 +11,19 @@ namespace ExcelFiller {
     class Workbook {
 
         HashMap<std::string, SheetRelation> sheetRelations_;
-        std::optional<SharedStringTable> sharedStringTable_;
+        SharedStringTable sharedStringTable_;
 
         friend std::ostream& operator<<(std::ostream& os, const Workbook& wb);
 
     public:
         explicit Workbook(pugi::xml_node workbook, SheetRelations&& relations,
-                          std::optional<SharedStringTable>&& sharedStringTable);
+                          SharedStringTable&& sharedStringTable);
 
         [[nodiscard]] const std::string& getSheetXmlName(const std::string& name) const;
 
         void writeSharedStringTable();
 
-        [[nodiscard]] std::optional<SharedStringTable>& getSharedStringTable();
+        [[nodiscard]] SharedStringTable& getSharedStringTable();
     };
 
     std::ostream& operator<<(std::ostream& os, const Workbook& wb);

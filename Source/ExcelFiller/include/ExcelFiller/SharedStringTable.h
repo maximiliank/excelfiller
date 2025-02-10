@@ -22,6 +22,7 @@ namespace ExcelFiller {
 
     public:
         explicit SharedStringTable(pugi::xml_document&& sharedStringTable, XlsxWorkbook& workbook);
+        explicit SharedStringTable(XlsxWorkbook& workbook);
 
         [[nodiscard]] std::size_t getSharedStringIndex(std::string_view item);
 

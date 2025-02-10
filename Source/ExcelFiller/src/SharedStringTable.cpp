@@ -2,6 +2,23 @@
 
 #include "ExcelFiller/xlsxWorkbook.h"
 #include <spdlog/spdlog.h>
+#include <stdexcept>
+
+ExcelFiller::SharedStringTable::SharedStringTable(XlsxWorkbook& workbook)
+    : sharedStringTable_([]() {
+          constexpr const char* xml_string =
+                  R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"></sst>)";
+
+          pugi::xml_document doc;
+          pugi::xml_parse_result result = doc.load_string(xml_string);
+          if (!result)
+          {
+              throw std::runtime_error("Failed to construct empty SharedString XML");
+          }
+          return doc;
+      }()),
+      workbook_(workbook)
+{}
 
 ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStringTable,
                                                   XlsxWorkbook& workbook)

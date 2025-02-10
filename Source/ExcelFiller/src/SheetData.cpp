@@ -3,8 +3,7 @@
 #include <string_view>
 #include <vector>
 
-ExcelFiller::SheetData::SheetData(pugi::xml_node data,
-                                  std::optional<SharedStringTable>& sharedStringTable)
+ExcelFiller::SheetData::SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable)
     : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)
 {}
 
@@ -69,9 +68,8 @@ namespace ExcelFiller {
         }
     }// namespace
 }// namespace ExcelFiller
-void ExcelFiller::ColumnProxy::setValue(
-        std::size_t column, double value,
-        [[maybe_unused]] std::optional<SharedStringTable>& sharedStringTable)
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value,
+                                        [[maybe_unused]] SharedStringTable& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
@@ -99,7 +97,7 @@ void ExcelFiller::ColumnProxy::setValue(
 }
 
 void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_view value,
-                                        std::optional<SharedStringTable>& sharedStringTable)
+                                        SharedStringTable& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
@@ -116,13 +114,13 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_vi
 
     auto valueNode = getValueNode(currentColumn_);
 
-    const auto idx = sharedStringTable->getSharedStringIndex(value);
+    const auto idx = sharedStringTable.getSharedStringIndex(value);
     valueNode.text() = idx;
 }
 
 
 void ExcelFiller::ColumnProxy::setValue(std::size_t column, const CellVariants value,
-                                        std::optional<SharedStringTable>& sharedStringTable)
+                                        SharedStringTable& sharedStringTable)
 {
     std::visit([this, column,
                 &sharedStringTable](auto&& arg) { setValue(column, arg, sharedStringTable); },

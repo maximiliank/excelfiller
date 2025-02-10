@@ -2,7 +2,6 @@
 
 #include "ExcelFiller/SharedStringTable.h"
 #include <concepts>
-#include <optional>
 #include <pugixml.hpp>
 #include <variant>
 namespace ExcelFiller {
@@ -17,14 +16,12 @@ namespace ExcelFiller {
     public:
         explicit ColumnProxy(pugi::xml_node column, std::size_t row);
 
-        void setValue(std::size_t column, double value,
-                      std::optional<SharedStringTable>& sharedStringTable);
+        void setValue(std::size_t column, double value, SharedStringTable& sharedStringTable);
 
         void setValue(std::size_t column, std::string_view value,
-                      std::optional<SharedStringTable>& sharedStringTable);
+                      SharedStringTable& sharedStringTable);
 
-        void setValue(std::size_t column, CellVariants value,
-                      std::optional<SharedStringTable>& sharedStringTable);
+        void setValue(std::size_t column, CellVariants value, SharedStringTable& sharedStringTable);
     };
 
     class RowProxy {
@@ -40,8 +37,7 @@ namespace ExcelFiller {
         explicit RowProxy(pugi::xml_node row);
 
         template<CellConcept T>
-        void setValue(std::size_t column, T value,
-                      std::optional<SharedStringTable>& sharedStringTable)
+        void setValue(std::size_t column, T value, SharedStringTable& sharedStringTable)
         {
             columnProxy_.setValue(column, value, sharedStringTable);
         }
@@ -53,11 +49,10 @@ namespace ExcelFiller {
     class SheetData {
         pugi::xml_node data_;
         RowProxy rowProxy_;
-        std::optional<SharedStringTable>& sharedStringTable_;
+        SharedStringTable& sharedStringTable_;
 
     public:
-        explicit SheetData(pugi::xml_node data,
-                           std::optional<SharedStringTable>& sharedStringTable);
+        explicit SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable);
 
         template<CellConcept T>
         void setValue(std::size_t row, std::size_t column, T value)
