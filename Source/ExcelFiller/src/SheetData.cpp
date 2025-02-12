@@ -95,7 +95,11 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value,
         currentColumn_.append_attribute("t").set_value("n");
     valueNode.text() = value;
 }
-
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string& value,
+                                        SharedStringTable& sharedStringTable)
+{
+    setValue(column, std::string_view{value}, sharedStringTable);
+}
 void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_view value,
                                         SharedStringTable& sharedStringTable)
 {
@@ -119,7 +123,7 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_vi
 }
 
 
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, const CellVariants value,
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, const CellVariants& value,
                                         SharedStringTable& sharedStringTable)
 {
     std::visit([this, column,

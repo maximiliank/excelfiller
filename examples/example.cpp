@@ -1,4 +1,4 @@
-#include "ExcelFiller/SheetData.h"
+#include "ExcelFiller/concepts.hpp"
 #include "ExcelFiller/xlsxWorkbook.h"
 #include "get_file_path.hpp"
 #include <filesystem>
@@ -8,15 +8,8 @@
 #include <string_view>
 #include <unistd.h>
 
-template<ExcelFiller::CellConcept T>
-struct CellValue {
-    size_t row_;
-    size_t column_;
-    T value_;
-};
 
-
-using Results = std::vector<CellValue<double>>;
+using Results = std::vector<::ExcelFiller::CellValueDoubles>;
 Results createRandomValues(const std::size_t rows, const std::size_t columns)
 {
     std::random_device rd;
@@ -35,13 +28,13 @@ Results createRandomValues(const std::size_t rows, const std::size_t columns)
     }
     return values;
 }
-std::vector<CellValue<std::string_view>> createStrings(const std::size_t rows,
-                                                       const std::size_t columns)
+std::vector<ExcelFiller::CellValue<std::string_view>> createStrings(const std::size_t rows,
+                                                                    const std::size_t columns)
 {
     static std::vector<std::string> values;
     values.reserve(rows * columns);
 
-    std::vector<CellValue<std::string_view>> ret;
+    std::vector<ExcelFiller::CellValue<std::string_view>> ret;
     ret.reserve(rows * columns);
 
     for (std::size_t i = 1; i <= rows; ++i)
@@ -55,13 +48,13 @@ std::vector<CellValue<std::string_view>> createStrings(const std::size_t rows,
     }
     return ret;
 }
-std::vector<CellValue<ExcelFiller::CellVariants>> createVariants(const std::size_t rows,
-                                                                 const std::size_t columns)
+std::vector<::ExcelFiller::CellValue<::ExcelFiller::CellVariants>>
+createVariants(const std::size_t rows, const std::size_t columns)
 {
     static std::vector<std::string> strings;
     strings.reserve(rows * columns);
 
-    std::vector<CellValue<ExcelFiller::CellVariants>> ret;
+    std::vector<::ExcelFiller::CellValue<::ExcelFiller::CellVariants>> ret;
     ret.reserve(rows * columns);
 
     for (std::size_t i = 1; i <= rows; ++i)
@@ -83,9 +76,9 @@ std::vector<CellValue<ExcelFiller::CellVariants>> createVariants(const std::size
     return ret;
 }
 
-template<ExcelFiller::CellConcept T>
+template<::ExcelFiller::Concepts::CellConcept T>
 void writeSheet(ExcelFiller::XlsxWorkbook& wb, const std::string& sheetName,
-                std::vector<CellValue<T>> values)
+                std::vector<::ExcelFiller::CellValue<T>> values)
 {
     spdlog::stopwatch sw;
     auto sheet = wb.getWorksheet(sheetName);

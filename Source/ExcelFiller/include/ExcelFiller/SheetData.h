@@ -1,14 +1,12 @@
 #pragma once
 
 #include "ExcelFiller/SharedStringTable.h"
-#include <concepts>
+#include "ExcelFiller/concepts.hpp"
 #include <pugixml.hpp>
-#include <variant>
+#include <string_view>
+
 namespace ExcelFiller {
-    using CellVariants = std::variant<double, std::string_view>;
-    template<typename T>
-    concept CellConcept = std::same_as<T, double> or std::same_as<T, std::string_view> or
-                          std::same_as<T, CellVariants>;
+
     class ColumnProxy {
         pugi::xml_node currentColumn_;
         std::string rowStr_;
@@ -21,7 +19,11 @@ namespace ExcelFiller {
         void setValue(std::size_t column, std::string_view value,
                       SharedStringTable& sharedStringTable);
 
-        void setValue(std::size_t column, CellVariants value, SharedStringTable& sharedStringTable);
+        void setValue(std::size_t column, const std::string& value,
+                      SharedStringTable& sharedStringTable);
+
+        void setValue(std::size_t column, const CellVariants& value,
+                      SharedStringTable& sharedStringTable);
     };
 
     class RowProxy {
@@ -36,8 +38,8 @@ namespace ExcelFiller {
     public:
         explicit RowProxy(pugi::xml_node row);
 
-        template<CellConcept T>
-        void setValue(std::size_t column, T value, SharedStringTable& sharedStringTable)
+        template<::ExcelFiller::Concepts::CellConcept T>
+        void setValue(std::size_t column, const T& value, SharedStringTable& sharedStringTable)
         {
             columnProxy_.setValue(column, value, sharedStringTable);
         }
@@ -54,8 +56,8 @@ namespace ExcelFiller {
     public:
         explicit SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable);
 
-        template<CellConcept T>
-        void setValue(std::size_t row, std::size_t column, T value)
+        template<::ExcelFiller::Concepts::CellConcept T>
+        void setValue(std::size_t row, std::size_t column, const T& value)
         {
             rowProxy_.setRow(row);
             rowProxy_.setValue(column, value, sharedStringTable_);
