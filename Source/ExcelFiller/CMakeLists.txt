@@ -15,7 +15,7 @@ target_include_directories(
             $<INSTALL_INTERFACE:include/>)
 target_link_libraries(
   ${TARGET_NAME}
-  PRIVATE project_options project_warnings zip::zip fmt::fmt
+  PRIVATE project_options project_warnings zip::zip fmt::fmt spdlog::spdlog
   PUBLIC pugixml::pugixml)
 
 install(TARGETS project_options EXPORT ${TARGET_NAME}Targets)

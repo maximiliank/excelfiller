@@ -36,12 +36,9 @@ e.g.:
 #include <algorithm>
 #include <tuple>
 #include "ExcelFiller/xlsxWorkbook.h"
+#include "ExcelFiller/concepts.hpp"
 
-struct CellValue {
-    size_t row_;
-    size_t column_;
-    double value_;
-};
+using CellValue = ::ExcelFiller::CellValueDoubles;
 
 int main() {
     std::vector<CellValue> values = { /* initialize your data here */};
@@ -98,7 +95,7 @@ find_package(ExcelFiller CONFIG REQUIRED)
 ```
 
 It is also possible to include the required subdirectories using `FetchContent_Declare`. This ensures that the same compiler flags are used.
-You should only include the subfolder containing the source of `ExcelFiller` and if your project does not include the [kuba-- zip](https://github.com/kuba--/zip "zip") library you should also include the zip folder.
+You should only include the subfolder containing the source of `ExcelFiller`.
 You can create a file `cmake/ExcelFiller.cmake` with the following content:
 ```cmake
 include(FetchContent)
@@ -120,9 +117,6 @@ endif ()
 if (NOT TARGET project_warnings)
     add_library(project_warnings INTERFACE)
 endif ()
-if (NOT TARGET zip::zip)
-    add_subdirectory(${excel_filler_SOURCE_DIR}/Source/zip ${excel_filler_BINARY_DIR}_zip)
-endif ()
 ```
 
 and then include it in your `CMakeLists.txt`
@@ -134,7 +128,7 @@ add_subdirectory(${excel_filler_SOURCE_DIR}/Source/ExcelFiller ${excel_filler_BI
 Note that if you follow the same `CMake` setup your `INTERFACE` targets `project_options` and `project_warnings` are also applied to `ExcelFiller`.
 If you do not have these targets they are defined as empty interfaces.
 
-The finding of `fmt` and `pugixml` has to be done on the consuming project in this case.
+The finding of `fmt`, `pugixml` and [kuba-- zip](https://github.com/kuba--/zip "zip") has to be done on the consuming project in this case.
 
 Notes
 -----

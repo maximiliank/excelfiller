@@ -11,6 +11,18 @@ ExcelFiller::ZipXMLHelper::~ZipXMLHelper()
 {
     close();
 }
+bool ExcelFiller::ZipXMLHelper::hasFile(const std::string& file) const
+{
+    if (zip_entry_open(zip_, file.c_str()) == 0)
+    {
+        zip_entry_close(zip_);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 pugi::xml_document ExcelFiller::ZipXMLHelper::loadXMLFile(const std::string& file)
 {
     if (zip_entry_open(zip_, file.c_str()) == 0)
