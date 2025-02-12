@@ -1,7 +1,6 @@
 #include "ExcelFiller/SheetData.h"
 #include <fmt/format.h>
 #include <string_view>
-#include <vector>
 
 ExcelFiller::SheetData::SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable)
     : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)
@@ -91,8 +90,6 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value,
     }();
     if (auto attr = currentColumn_.attribute("t"); !attr.empty())
         attr.set_value("n");
-    else
-        currentColumn_.append_attribute("t").set_value("n");
     valueNode.text() = value;
 }
 void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string& value,
