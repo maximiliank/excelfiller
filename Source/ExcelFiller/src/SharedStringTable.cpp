@@ -29,7 +29,6 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
     if (countAttr)
     {
         stringIndexCount_ = countAttr.as_uint();
-        //sharedStrings_.reserve(count);
     }
 
     // Iterate through <si> elements
