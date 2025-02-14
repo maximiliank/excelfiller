@@ -5,6 +5,7 @@
 #include <pugixml.hpp>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace ExcelFiller {
     class XlsxWorkbook;
@@ -17,6 +18,7 @@ namespace ExcelFiller {
         XlsxWorkbook& workbook_;
         HashMap_t existingSharedStrings_;
         HashMap_t newlyAddedStrings_;
+        std::vector<const char*> newlyAddedStringsOrder_;
 
         std::size_t stringIndexCount_{0};
 

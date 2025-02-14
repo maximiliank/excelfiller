@@ -128,7 +128,7 @@ add_subdirectory(${excel_filler_SOURCE_DIR}/Source/ExcelFiller ${excel_filler_BI
 Note that if you follow the same `CMake` setup your `INTERFACE` targets `project_options` and `project_warnings` are also applied to `ExcelFiller`.
 If you do not have these targets they are defined as empty interfaces.
 
-The finding of `fmt`, `pugixml` and [kuba-- zip](https://github.com/kuba--/zip "zip") has to be done on the consuming project in this case.
+The finding of `fmt`, `pugixml`, `spdlog` and [kuba-- zip](https://github.com/kuba--/zip "zip") has to be done on the consuming project in this case.
 
 Notes
 -----

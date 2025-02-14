@@ -2,6 +2,7 @@
 
 #include "ExcelFiller/xlsxWorkbook.h"
 #include <spdlog/spdlog.h>
+#include <sstream>
 #include <stdexcept>
 
 ExcelFiller::SharedStringTable::SharedStringTable(XlsxWorkbook& workbook)
@@ -25,7 +26,7 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
     : sharedStringTable_(std::move(sharedStringTable)), workbook_(workbook)
 {
     pugi::xml_node sst = sharedStringTable_.child("sst");
-    pugi::xml_attribute countAttr = sst.attribute("count");
+    pugi::xml_attribute countAttr = sst.attribute("uniqueCount");
     if (countAttr)
     {
         stringIndexCount_ = countAttr.as_uint();
@@ -36,7 +37,6 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
     for (pugi::xml_node si = sst.child("si"); si; si = si.next_sibling("si"))
     {
         std::string text;
-
         pugi::xml_node t = si.child("t");
         if (t)
         {
@@ -44,19 +44,25 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
         }
         else
         {
-            // Handle rich text nodes where multiple <r><t> exist
-            for (pugi::xml_node r = si.child("r"); r; r = r.next_sibling("r"))
+            std::ostringstream oss;
+            for (pugi::xml_node child = si.first_child(); child; child = child.next_sibling())
             {
-                pugi::xml_node t_rich = r.child("t");
-                if (t_rich)
-                {
-                    text += t_rich.child_value();
-                }
+                child.print(oss);
             }
+            text = oss.str();
         }
 
-        existingSharedStrings_.emplace(std::move(text), counter++);
+        auto [it, inserted] = existingSharedStrings_.emplace(std::move(text), counter++);
+        if (!inserted)
+        {
+            std::ostringstream oss;
+            si.print(oss);
+            spdlog::warn("Duplicate string found in SharedStringTable at si element {}. SI "
+                         "node:\n{}\nIndex of previous string: {} with value: '{}'",
+                         counter, oss.str(), it->second + 1, it->first);
+        }
     }
+    spdlog::debug("Loaded {} shared strings", counter);
     if (existingSharedStrings_.size() != stringIndexCount_)
     {
         spdlog::warn("SharedStringTable count does not match number of strings stored {} != {}",
@@ -75,7 +81,8 @@ std::size_t ExcelFiller::SharedStringTable::getSharedStringIndex(const std::stri
     {
         return it->second;
     }
-    newlyAddedStrings_.emplace(item, stringIndexCount_);
+    const auto [it, inserted] = newlyAddedStrings_.emplace(item, stringIndexCount_);
+    newlyAddedStringsOrder_.emplace_back(it->first.c_str());
     return stringIndexCount_++;
 }
 
@@ -84,12 +91,12 @@ void ExcelFiller::SharedStringTable::writeSharedStringTable()
     if (!newlyAddedStrings_.empty())
     {
         pugi::xml_node sst = sharedStringTable_.child("sst");
-        for (const auto& [str, idx] : newlyAddedStrings_)
+        for (const auto* const str : newlyAddedStringsOrder_)
         {
             pugi::xml_node si = sst.append_child("si");
             pugi::xml_node t = si.append_child("t");
             t.append_attribute("xml:space") = "preserve";
-            t.text().set(str.c_str());
+            t.text().set(str);
         }
 
         const auto updateCounts =
