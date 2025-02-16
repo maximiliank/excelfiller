@@ -81,13 +81,22 @@
                 "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
+        },
+        {
+            "name": "unixlike-gcc-release-ci",
+            "displayName": "gcc Release CI",
+            "description": "Target Unix-like OS with the gcc compiler, release build type with disabled examples",
+            "inherits": "unixlike-gcc-release",
+            "cacheVariables": {
+                "BUILD_EXAMPLES": "OFF"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "build-unixlike-gcc-release",
             "displayName": "Build Release",
-            "configurePreset": "unixlike-gcc-release",
+            "configurePreset": "unixlike-gcc-release-ci",
             "targets": [ "ExcelFiller" ]
         }
     ],
@@ -141,7 +150,7 @@
             "steps": [
                 {
                     "type": "configure",
-                    "name": "unixlike-gcc-release"
+                    "name": "unixlike-gcc-release-ci"
                 },
                 {
                     "type": "build",
