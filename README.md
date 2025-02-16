@@ -104,11 +104,12 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/maximiliank/excelfiller.git
         GIT_TAG origin/main
         UPDATE_DISCONNECTED   ON
+        SOURCE_SUBDIR somePathThatNeverExists
 )
 
 FetchContent_GetProperties(excel_filler)
 if (NOT excel_filler_POPULATED)
-    FetchContent_Populate(excel_filler)
+    FetchContent_MakeAvailable(excel_filler)
 endif ()
 
 if (NOT TARGET project_options)

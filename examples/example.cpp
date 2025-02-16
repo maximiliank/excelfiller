@@ -28,8 +28,7 @@ Results createRandomValues(const std::size_t rows, const std::size_t columns)
     }
     return values;
 }
-std::vector<ExcelFiller::CellValue<std::string_view>> createStrings(const std::size_t rows,
-                                                                    const std::size_t columns)
+std::vector<ExcelFiller::CellValue<std::string_view>> createStrings(const std::size_t rows, const std::size_t columns)
 {
     static std::vector<std::string> values;
     values.reserve(rows * columns);
@@ -48,8 +47,8 @@ std::vector<ExcelFiller::CellValue<std::string_view>> createStrings(const std::s
     }
     return ret;
 }
-std::vector<::ExcelFiller::CellValue<::ExcelFiller::CellVariants>>
-createVariants(const std::size_t rows, const std::size_t columns)
+std::vector<::ExcelFiller::CellValue<::ExcelFiller::CellVariants>> createVariants(
+        const std::size_t rows, const std::size_t columns)
 {
     static std::vector<std::string> strings;
     strings.reserve(rows * columns);
@@ -77,15 +76,17 @@ createVariants(const std::size_t rows, const std::size_t columns)
 }
 
 template<::ExcelFiller::Concepts::CellConcept T>
-void writeSheet(ExcelFiller::XlsxWorkbook& wb, const std::string& sheetName,
-                std::vector<::ExcelFiller::CellValue<T>> values)
+void writeSheet(
+        ExcelFiller::XlsxWorkbook& wb, const std::string& sheetName, std::vector<::ExcelFiller::CellValue<T>> values)
 {
     spdlog::stopwatch sw;
     auto sheet = wb.getWorksheet(sheetName);
     auto sheetData = sheet.getSheetData();
 
     for (const auto& cell : values)
+    {
         sheetData.setValue(cell.row_, cell.column_, cell.value_);
+    }
 
 
     sheet.save();
@@ -103,8 +104,7 @@ int main()
 
         const std::string targetFilename{"example_filled.xlsx"};
         spdlog::stopwatch swAll;
-        std::filesystem::copy(filenameOriginal, targetFilename,
-                              std::filesystem::copy_options::overwrite_existing);
+        std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
 
         ExcelFiller::XlsxWorkbook wb(targetFilename);
         writeSheet(wb, "Sheet1", createRandomValues(2, 2));

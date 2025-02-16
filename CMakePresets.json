@@ -1,8 +1,8 @@
 {
-    "version": 3,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 21,
+        "minor": 26,
         "patch": 0
     },
     "configurePresets": [
@@ -14,8 +14,7 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_PROJECT_excelfiller_INCLUDE_BEFORE": "cmake/Conan.cmake",
-                "CMAKE_VERBOSE_MAKEFILE": false
+                "CMAKE_PROJECT_excelfiller_INCLUDE_BEFORE": "cmake/Conan.cmake"
             }
         },
         {
@@ -82,6 +81,23 @@
                 "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
+        },
+        {
+            "name": "unixlike-gcc-release-ci",
+            "displayName": "gcc Release CI",
+            "description": "Target Unix-like OS with the gcc compiler, release build type with disabled examples",
+            "inherits": "unixlike-gcc-release",
+            "cacheVariables": {
+                "BUILD_EXAMPLES": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-unixlike-gcc-release",
+            "displayName": "Build Release",
+            "configurePreset": "unixlike-gcc-release-ci",
+            "targets": [ "ExcelFiller" ]
         }
     ],
     "testPresets": [
@@ -124,6 +140,23 @@
             "description": "Enable output and stop on failure",
             "inherits": "test-common",
             "configurePreset": "unixlike-clang-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "build-unixlike-gcc-release",
+            "displayName": "Full Build (Configure + Build)",
+            "description": "Runs configure and builds ExcelFiller",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "unixlike-gcc-release-ci"
+                },
+                {
+                    "type": "build",
+                    "name": "build-unixlike-gcc-release"
+                }
+            ]
         }
     ]
 }

@@ -1,25 +1,32 @@
-# Generated from CLion C/C++ Code Style settings
-BasedOnStyle: LLVM
-AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
+AccessModifierOffset: -2
+AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Right
 AlignOperands: true
-AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Always
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: true
+BinPackParameters: true
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
-  AfterControlStatement: Always
+  AfterControlStatement: true
   AfterEnum: false
   AfterFunction: true
   AfterNamespace: false
@@ -33,9 +40,24 @@ BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-ColumnLimit: 100
+BreakConstructorInitializersBeforeComma: false
+BreakStringLiterals: true
+ColumnLimit: 120
+CommentPragmas: "^ IWYU pragma:"
 CompactNamespaces: false
 ContinuationIndentWidth: 8
+FixNamespaceComments: false
+ForEachMacros:
+  - foreach
+  - Q_FOREACH
+  - BOOST_FOREACH
+IncludeCategories:
+  - Priority: 2
+    Regex: ^"(llvm|llvm-c|clang|clang-c)/
+  - Priority: 3
+    Regex: ^(<|"(gtest|gmock|isl|json)/)
+  - Priority: 1
+    Regex: .*
 IndentCaseLabels: true
 IndentPPDirectives: None
 IndentWidth: 4
@@ -45,7 +67,11 @@ NamespaceIndentation: All
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PointerAlignment: Left
+QualifierAlignment: Left
 ReflowComments: false
+RequiresClausePosition: WithFollowing
+SortIncludes: false
+SortUsingDeclarations: false
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: false
@@ -56,11 +82,12 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 0
+SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
+Standard: c++20
 TabWidth: 4
 UseTab: Never

@@ -13,15 +13,15 @@ namespace ExcelFiller {
         void reopenFile(int level, char mode);
         void close();
 
-    public:
+      public:
         explicit ZipXMLHelper(const std::string& filename);
 
         ~ZipXMLHelper();
 
-    protected:
+      protected:
         [[nodiscard]] bool hasFile(const std::string& file) const;
         [[nodiscard]] pugi::xml_document loadXMLFile(const std::string& file);
 
         void writeXMLFile(const std::string& file, const pugi::xml_document& doc);
     };
-}// namespace ExcelFiller
+} // namespace ExcelFiller

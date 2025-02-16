@@ -21,8 +21,7 @@ ExcelFiller::SharedStringTable::SharedStringTable(XlsxWorkbook& workbook)
       workbook_(workbook)
 {}
 
-ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStringTable,
-                                                  XlsxWorkbook& workbook)
+ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStringTable, XlsxWorkbook& workbook)
     : sharedStringTable_(std::move(sharedStringTable)), workbook_(workbook)
 {
     pugi::xml_node sst = sharedStringTable_.child("sst");
@@ -57,23 +56,23 @@ ExcelFiller::SharedStringTable::SharedStringTable(pugi::xml_document&& sharedStr
         {
             std::ostringstream oss;
             si.print(oss);
-            spdlog::warn("Duplicate string found in SharedStringTable at si element {}. SI "
-                         "node:\n{}\nIndex of previous string: {} with value: '{}'",
-                         counter, oss.str(), it->second + 1, it->first);
+            spdlog::warn(
+                    "Duplicate string found in SharedStringTable at si element {}. SI "
+                    "node:\n{}\nIndex of previous string: {} with value: '{}'",
+                    counter, oss.str(), it->second + 1, it->first);
         }
     }
     spdlog::debug("Loaded {} shared strings", counter);
     if (existingSharedStrings_.size() != stringIndexCount_)
     {
         spdlog::warn("SharedStringTable count does not match number of strings stored {} != {}",
-                     existingSharedStrings_.size(), stringIndexCount_);
+                existingSharedStrings_.size(), stringIndexCount_);
     }
 }
 
 std::size_t ExcelFiller::SharedStringTable::getSharedStringIndex(const std::string_view item)
 {
-    if (auto itExisting = existingSharedStrings_.find(item);
-        itExisting != existingSharedStrings_.end())
+    if (auto itExisting = existingSharedStrings_.find(item); itExisting != existingSharedStrings_.end())
     {
         return itExisting->second;
     }
@@ -99,15 +98,14 @@ void ExcelFiller::SharedStringTable::writeSharedStringTable()
             t.text().set(str);
         }
 
-        const auto updateCounts =
-                [&sst, addedStrings = newlyAddedStrings_.size()](const char* counterName) {
-                    pugi::xml_attribute countAttr = sst.attribute(counterName);
-                    if (countAttr)
-                    {
-                        const auto oldCount = countAttr.as_uint();
-                        countAttr.set_value(oldCount + addedStrings);
-                    }
-                };
+        const auto updateCounts = [&sst, addedStrings = newlyAddedStrings_.size()](const char* counterName) {
+            pugi::xml_attribute countAttr = sst.attribute(counterName);
+            if (countAttr)
+            {
+                const auto oldCount = countAttr.as_uint();
+                countAttr.set_value(oldCount + addedStrings);
+            }
+        };
         updateCounts("count");
         updateCounts("uniqueCount");
 

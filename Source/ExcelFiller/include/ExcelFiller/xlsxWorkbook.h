@@ -9,7 +9,7 @@ namespace ExcelFiller {
     class XlsxWorkbook : ZipXMLHelper {
         Workbook workbook_;
 
-    public:
+      public:
         using ZipXMLHelper::writeXMLFile;
 
         explicit XlsxWorkbook(const std::string& filename);
@@ -20,4 +20,4 @@ namespace ExcelFiller {
 
         void writeSharedStringTable();
     };
-}// namespace ExcelFiller
+} // namespace ExcelFiller
