@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Fix clang-tidy",
+            "hide": false,
+            "command": "run-clang-tidy",
+            "args": [ "-fix", "-checks='-*,readability-braces-around-statements'", "-p=out/build" ],
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
