@@ -11,19 +11,16 @@ namespace ExcelFiller {
         pugi::xml_node currentColumn_;
         std::string rowStr_;
 
-    public:
+      public:
         explicit ColumnProxy(pugi::xml_node column, std::size_t row);
 
         void setValue(std::size_t column, double value, SharedStringTable& sharedStringTable);
 
-        void setValue(std::size_t column, std::string_view value,
-                      SharedStringTable& sharedStringTable);
+        void setValue(std::size_t column, std::string_view value, SharedStringTable& sharedStringTable);
 
-        void setValue(std::size_t column, const std::string& value,
-                      SharedStringTable& sharedStringTable);
+        void setValue(std::size_t column, const std::string& value, SharedStringTable& sharedStringTable);
 
-        void setValue(std::size_t column, const CellVariants& value,
-                      SharedStringTable& sharedStringTable);
+        void setValue(std::size_t column, const CellVariants& value, SharedStringTable& sharedStringTable);
     };
 
     class RowProxy {
@@ -35,7 +32,7 @@ namespace ExcelFiller {
 
         void setColumnProxy();
 
-    public:
+      public:
         explicit RowProxy(pugi::xml_node row);
 
         template<::ExcelFiller::Concepts::CellConcept T>
@@ -53,7 +50,7 @@ namespace ExcelFiller {
         RowProxy rowProxy_;
         SharedStringTable& sharedStringTable_;
 
-    public:
+      public:
         explicit SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable);
 
         template<::ExcelFiller::Concepts::CellConcept T>
@@ -65,4 +62,4 @@ namespace ExcelFiller {
 
         [[nodiscard]] const pugi::xml_node& getData() const;
     };
-}// namespace ExcelFiller
+} // namespace ExcelFiller

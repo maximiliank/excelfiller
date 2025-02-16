@@ -35,14 +35,17 @@ ExcelFiller::HashMap<std::string, std::vector<CellValue>> loadTargetCells()
         const auto columns = value["columns"].get<std::vector<std::size_t>>();
 
         if (rows.size() != columns.size())
-            throw std::runtime_error(
-                    fmt::format("Target cells file {} is malformed", target_cells_file));
+        {
+            throw std::runtime_error(fmt::format("Target cells file {} is malformed", target_cells_file));
+        }
 
         std::vector<CellValue> cells;
         cells.reserve(rows.size());
 
         for (std::size_t i = 0; i < rows.size(); ++i)
+        {
             cells.emplace_back(rows[i], columns[i], -1.);
+        }
 
         ret.emplace(key, std::move(cells));
     }
@@ -58,16 +61,17 @@ void fillWithRandomValues(ExcelFiller::HashMap<std::string, std::vector<CellValu
     for (auto& [sheet, cells] : targets)
     {
         for (auto& cell : cells)
+        {
             cell.value_ = dis(gen);
+        }
     }
 }
 
 void writeExcel(const std::string& filenameOriginal, const std::string& targetFilename,
-                const ExcelFiller::HashMap<std::string, std::vector<CellValue>>& targets)
+        const ExcelFiller::HashMap<std::string, std::vector<CellValue>>& targets)
 {
     spdlog::stopwatch swAll;
-    std::filesystem::copy(filenameOriginal, targetFilename,
-                          std::filesystem::copy_options::overwrite_existing);
+    std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
 
     ExcelFiller::XlsxWorkbook wb(targetFilename);
 
@@ -79,7 +83,9 @@ void writeExcel(const std::string& filenameOriginal, const std::string& targetFi
         auto sheetData = sheet.getSheetData();
 
         for (const auto& cell : cells)
+        {
             sheetData.setValue(cell.row_, cell.column_, cell.value_);
+        }
         sheet.save();
 
         spdlog::info("Wrote {} cells to sheet {} in {:.4} seconds.", cells.size(), sheetName, sw);
@@ -96,10 +102,12 @@ int main()
         auto targetCells = loadTargetCells();
         fillWithRandomValues(targetCells);
         for (auto& [sheetName, cells] : targetCells)
+        {
             sortCells(cells);
+        }
 
         writeExcel("EBA_2021_EU-wide_stress_test_Templates_v0.xlsx",
-                   "EBA_2021_EU-wide_stress_test_Templates_v0_filled.xlsx", targetCells);
+                "EBA_2021_EU-wide_stress_test_Templates_v0_filled.xlsx", targetCells);
         return 0;
     }
     catch (const std::exception& ex)

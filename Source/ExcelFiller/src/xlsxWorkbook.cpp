@@ -10,11 +10,9 @@ ExcelFiller::XlsxWorkbook::XlsxWorkbook(const std::string& filename)
           doc = ZipXMLHelper::loadXMLFile("xl/workbook.xml");
           SharedStringTable sharedStringTable =
                   ZipXMLHelper::hasFile("xl/sharedStrings.xml")
-                          ? SharedStringTable(ZipXMLHelper::loadXMLFile("xl/sharedStrings.xml"),
-                                              *this)
+                          ? SharedStringTable(ZipXMLHelper::loadXMLFile("xl/sharedStrings.xml"), *this)
                           : SharedStringTable(*this);
-          return Workbook(doc.child("workbook"), std::move(relations),
-                          std::move(sharedStringTable));
+          return Workbook(doc.child("workbook"), std::move(relations), std::move(sharedStringTable));
       }())
 {}
 

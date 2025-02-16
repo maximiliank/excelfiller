@@ -22,7 +22,9 @@ void ExcelFiller::RowProxy::setRow(const std::size_t row)
         {
             currentRow_ = currentRow_.next_sibling();
             if (currentRow_.empty())
+            {
                 throw std::runtime_error(fmt::format("Could not find row {}", row));
+            }
             row_ = getRowNumber(currentRow_);
         }
         setColumnProxy();
@@ -56,8 +58,7 @@ namespace ExcelFiller {
 
         pugi::xml_node getValueNode(pugi::xml_node item)
         {
-            auto node = item.find_child(
-                    [](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
+            auto node = item.find_child([](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
 
             if (node.empty())
             {
@@ -65,22 +66,23 @@ namespace ExcelFiller {
             }
             return node;
         }
-    }// namespace
-}// namespace ExcelFiller
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value,
-                                        [[maybe_unused]] SharedStringTable& sharedStringTable)
+    } // namespace
+} // namespace ExcelFiller
+void ExcelFiller::ColumnProxy::setValue(
+        std::size_t column, double value, [[maybe_unused]] SharedStringTable& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
     {
         currentColumn_ = currentColumn_.next_sibling();
         if (currentColumn_.empty())
+        {
             throw std::runtime_error(fmt::format("Could not find column {}", column));
+        }
     }
 
     auto valueNode = [this]() {
-        auto node = currentColumn_.find_child(
-                [](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
+        auto node = currentColumn_.find_child([](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
 
         if (node.empty())
         {
@@ -89,29 +91,37 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, double value,
         return node;
     }();
     if (auto attr = currentColumn_.attribute("t"); !attr.empty())
+    {
         attr.set_value("n");
+    }
     valueNode.text() = value;
 }
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string& value,
-                                        SharedStringTable& sharedStringTable)
+void ExcelFiller::ColumnProxy::setValue(
+        std::size_t column, const std::string& value, SharedStringTable& sharedStringTable)
 {
     setValue(column, std::string_view{value}, sharedStringTable);
 }
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_view value,
-                                        SharedStringTable& sharedStringTable)
+void ExcelFiller::ColumnProxy::setValue(
+        std::size_t column, const std::string_view value, SharedStringTable& sharedStringTable)
 {
     const auto cellRef = toBase26(column) + rowStr_;
     while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
     {
         currentColumn_ = currentColumn_.next_sibling();
         if (currentColumn_.empty())
+        {
             throw std::runtime_error(fmt::format("Could not find column {}", column));
+        }
     }
 
     if (auto attr = currentColumn_.attribute("t"); !attr.empty())
+    {
         attr.set_value("s");
+    }
     else
+    {
         currentColumn_.append_attribute("t").set_value("s");
+    }
 
     auto valueNode = getValueNode(currentColumn_);
 
@@ -120,10 +130,8 @@ void ExcelFiller::ColumnProxy::setValue(std::size_t column, const std::string_vi
 }
 
 
-void ExcelFiller::ColumnProxy::setValue(std::size_t column, const CellVariants& value,
-                                        SharedStringTable& sharedStringTable)
+void ExcelFiller::ColumnProxy::setValue(
+        std::size_t column, const CellVariants& value, SharedStringTable& sharedStringTable)
 {
-    std::visit([this, column,
-                &sharedStringTable](auto&& arg) { setValue(column, arg, sharedStringTable); },
-               value);
+    std::visit([this, column, &sharedStringTable](auto&& arg) { setValue(column, arg, sharedStringTable); }, value);
 }

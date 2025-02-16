@@ -35,12 +35,11 @@ pugi::xml_document ExcelFiller::ZipXMLHelper::loadXMLFile(const std::string& fil
 
         pugi::xml_document doc;
         auto result = doc.load_buffer_inplace_own(buffer, bufsize,
-                                                  pugi::parse_minimal | pugi::parse_declaration |
-                                                          pugi::parse_ws_pcdata_single,
-                                                  pugi::encoding_utf8);
+                pugi::parse_minimal | pugi::parse_declaration | pugi::parse_ws_pcdata_single, pugi::encoding_utf8);
         if (!result)
-            throw std::runtime_error(
-                    fmt::format("XML error {} (offset {})", result.description(), result.offset));
+        {
+            throw std::runtime_error(fmt::format("XML error {} (offset {})", result.description(), result.offset));
+        }
         return doc;
     }
     else
@@ -59,9 +58,7 @@ namespace ExcelFiller {
 
             xml_memory_writer() : buffer_(nullptr), capacity_(0), result_(0) {}
 
-            xml_memory_writer(char* buffer, size_t capacity)
-                : buffer_(buffer), capacity_(capacity), result_(0)
-            {}
+            xml_memory_writer(char* buffer, size_t capacity) : buffer_(buffer), capacity_(capacity), result_(0) {}
 
             [[nodiscard]] size_t written_size() const
             {
@@ -80,8 +77,8 @@ namespace ExcelFiller {
                 result_ += size;
             }
         };
-    }// namespace
-}// namespace ExcelFiller
+    } // namespace
+} // namespace ExcelFiller
 void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi::xml_document& doc)
 {
     const auto format = pugi::format_raw | pugi::format_save_file_text | pugi::format_no_escapes;
@@ -130,12 +127,18 @@ void ExcelFiller::ZipXMLHelper::reopenFile(int level, char mode)
 void ExcelFiller::ZipXMLHelper::close()
 {
     if (zip_ != nullptr)
+    {
         zip_close(zip_);
+    }
 }
 zip_t* ExcelFiller::ZipXMLHelper::openArchive(const char* zipfile, int level, char mode)
 {
     if (auto ptr = zip_open(zipfile, level, mode); ptr != nullptr)
+    {
         return ptr;
+    }
     else
+    {
         throw std::runtime_error(fmt::format("Could not open zip file {}", zipfile));
+    }
 }

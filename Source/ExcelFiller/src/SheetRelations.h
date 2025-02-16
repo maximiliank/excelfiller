@@ -10,10 +10,10 @@ namespace ExcelFiller {
 
         HashMap<std::string, SheetRelation> relations_;
 
-    public:
+      public:
         explicit SheetRelations(pugi::xml_node relationShips);
 
         friend std::ostream& operator<<(std::ostream& os, const SheetRelations& srs);
     };
     std::ostream& operator<<(std::ostream& os, const SheetRelations& srs);
-}// namespace ExcelFiller
+} // namespace ExcelFiller

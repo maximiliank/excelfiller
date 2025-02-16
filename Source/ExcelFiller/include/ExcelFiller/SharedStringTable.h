@@ -10,8 +10,7 @@
 namespace ExcelFiller {
     class XlsxWorkbook;
     class SharedStringTable {
-        using HashMap_t = HashMap<std::string, std::size_t, ::ExcelFiller::Utils::string_hash,
-                                  std::equal_to<>>;
+        using HashMap_t = HashMap<std::string, std::size_t, ::ExcelFiller::Utils::string_hash, std::equal_to<>>;
         friend class Workbook;
 
         pugi::xml_document sharedStringTable_;
@@ -22,7 +21,7 @@ namespace ExcelFiller {
 
         std::size_t stringIndexCount_{0};
 
-    public:
+      public:
         explicit SharedStringTable(pugi::xml_document&& sharedStringTable, XlsxWorkbook& workbook);
         explicit SharedStringTable(XlsxWorkbook& workbook);
 
@@ -30,4 +29,4 @@ namespace ExcelFiller {
 
         void writeSharedStringTable();
     };
-}// namespace ExcelFiller
+} // namespace ExcelFiller

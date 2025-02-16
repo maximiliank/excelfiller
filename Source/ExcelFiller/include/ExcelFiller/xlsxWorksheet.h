@@ -12,12 +12,11 @@ namespace ExcelFiller {
         XlsxWorkbook& workbook_;
         std::string xmlName_;
 
-    public:
-        explicit XlsxWorksheet(pugi::xml_document&& doc, XlsxWorkbook& workbook,
-                               std::string xmlName);
+      public:
+        explicit XlsxWorksheet(pugi::xml_document&& doc, XlsxWorkbook& workbook, std::string xmlName);
 
         SheetData getSheetData();
 
         void save();
     };
-}// namespace ExcelFiller
+} // namespace ExcelFiller

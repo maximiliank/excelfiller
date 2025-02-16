@@ -84,6 +84,14 @@
             }
         }
     ],
+    "buildPresets": [
+        {
+            "name": "build-unixlike-gcc-release",
+            "displayName": "Build Release",
+            "configurePreset": "unixlike-gcc-release",
+            "targets": [ "ExcelFiller" ]
+        }
+    ],
     "testPresets": [
         {
             "name": "test-common",

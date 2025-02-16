@@ -15,9 +15,8 @@ namespace ExcelFiller {
 
         friend std::ostream& operator<<(std::ostream& os, const Workbook& wb);
 
-    public:
-        explicit Workbook(pugi::xml_node workbook, SheetRelations&& relations,
-                          SharedStringTable&& sharedStringTable);
+      public:
+        explicit Workbook(pugi::xml_node workbook, SheetRelations&& relations, SharedStringTable&& sharedStringTable);
 
         [[nodiscard]] const std::string& getSheetXmlName(const std::string& name) const;
 
@@ -27,4 +26,4 @@ namespace ExcelFiller {
     };
 
     std::ostream& operator<<(std::ostream& os, const Workbook& wb);
-}// namespace ExcelFiller
+} // namespace ExcelFiller

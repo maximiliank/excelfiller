@@ -13,7 +13,7 @@ namespace ExcelFiller::Concepts {
     concept CellConcept = std::same_as<T, double> or std::same_as<T, std::string> or
                           std::same_as<T, std::string_view> or std::same_as<T, CellVariants>;
 
-}// namespace ExcelFiller::Concepts
+} // namespace ExcelFiller::Concepts
 namespace ExcelFiller {
     template<::ExcelFiller::Concepts::CellConcept T>
     struct CellValue {
@@ -25,4 +25,4 @@ namespace ExcelFiller {
     using CellValueDoubles = CellValue<double>;
     using CellValueStrings = CellValue<std::string>;
 
-}// namespace ExcelFiller
+} // namespace ExcelFiller

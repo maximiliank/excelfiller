@@ -17,10 +17,10 @@ namespace ExcelFiller::Utils {
         {
             return hash_type{}(str);
         }
-        [[nodiscard]] inline std::size_t operator()(std::string const& str) const
+        [[nodiscard]] inline std::size_t operator()(const std::string& str) const
         {
             return hash_type{}(str);
         }
     };
 
-}// namespace ExcelFiller::Utils
+} // namespace ExcelFiller::Utils
