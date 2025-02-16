@@ -42,8 +42,8 @@ jobs:
       with:
         languages: cpp
 
-    - name: Build
-      run: cmake --build --preset build-unixlike-gcc-release
+    - name: Run workflow
+      run: cmake --workflow --preset build-unixlike-gcc-release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

@@ -1,8 +1,8 @@
 {
-    "version": 3,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 21,
+        "minor": 26,
         "patch": 0
     },
     "configurePresets": [
@@ -14,8 +14,7 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_PROJECT_excelfiller_INCLUDE_BEFORE": "cmake/Conan.cmake",
-                "CMAKE_VERBOSE_MAKEFILE": false
+                "CMAKE_PROJECT_excelfiller_INCLUDE_BEFORE": "cmake/Conan.cmake"
             }
         },
         {
@@ -132,6 +131,23 @@
             "description": "Enable output and stop on failure",
             "inherits": "test-common",
             "configurePreset": "unixlike-clang-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "build-unixlike-gcc-release",
+            "displayName": "Full Build (Configure + Build)",
+            "description": "Runs configure and builds ExcelFiller",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "unixlike-gcc-release"
+                },
+                {
+                    "type": "build",
+                    "name": "build-unixlike-gcc-release"
+                }
+            ]
         }
     ]
 }
