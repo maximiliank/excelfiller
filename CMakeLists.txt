@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EBA_EXAMPLE "Build EBA template filling example" OFF)
 
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
@@ -27,7 +28,9 @@ set_project_warnings(project_warnings)
 
 excelfiller_setup_dependencies()
 
-# https://github.com/kuba--/zip add_subdirectory(Source/zip)
+include(cmake/ZipCpp.cmake)
+add_subdirectory(${zip_cpp_SOURCE_DIR}/Source/ZipCpp ${zip_cpp_BINARY_DIR}_zip_cpp)
+
 add_subdirectory(Source/ExcelFiller)
 
 if(BUILD_EXAMPLES)
