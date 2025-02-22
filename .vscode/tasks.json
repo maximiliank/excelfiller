@@ -5,7 +5,7 @@
             "label": "Fix clang-tidy",
             "hide": false,
             "command": "run-clang-tidy",
-            "args": [ "-fix", "-checks='-*,readability-braces-around-statements'", "-p=out/build" ],
+            "args": [ "-fix", "-checks='-*,readability-braces-around-statements'", "-header-filter=Source", "-p=out/build" ],
             "type": "shell",
             "group": {
                 "kind": "build",

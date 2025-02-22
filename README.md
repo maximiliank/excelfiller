@@ -1,16 +1,15 @@
 ExcelFiller
 ===========
 
-`ExcelFiller` is a library which aims to fill `double` precision floating point values into an Excel template. It is
+`ExcelFiller` is a library which aims to fill `double` precision floating point values or `std::strings` into an Excel template. It is
 designed to add values per sheet for coordinates given by row and column (one based) indices and writes them into the
 Excel template. Currently, it only supports adding values in a forward iteration manner to a sheet, i.e. your data
 should be sorted by row and column number.
 
-It depends on [pugixml](https://github.com/zeux/pugixml "pugixml")
-and [{fmt}](https://github.com/fmtlib/fmt "fmt") as libraries. Internally it uses
-uses [kuba-- zip](https://github.com/kuba--/zip "zip") as zip library which is included in the repository.
+It depends on [pugixml](https://github.com/zeux/pugixml "pugixml"), [{fmt}](https://github.com/fmtlib/fmt "fmt") and 
+[ZipCpp](https://github.com/maximiliank/ZipCpp "ZipCpp") as libraries.
 
-> **WARNING**: This is not an Excel library as it only handles a very specific use case. It is not even supporting strings, hence it is not even loading the shared string table inside the Excel archive.
+> **WARNING**: This is not an Excel library as it only handles a very specific use case.
 
 Also note that it does not add cells to the Excel template, i.e. the cell must be already available in the internal xml
 of the sheet.
@@ -100,24 +99,23 @@ You can create a file `cmake/ExcelFiller.cmake` with the following content:
 ```cmake
 include(FetchContent)
 FetchContent_Declare(
-        excel_filler
-        GIT_REPOSITORY https://github.com/maximiliank/excelfiller.git
-        GIT_TAG origin/main
-        UPDATE_DISCONNECTED   ON
-        SOURCE_SUBDIR somePathThatNeverExists
-)
+  excel_filler
+  GIT_REPOSITORY https://github.com/maximiliank/excelfiller.git
+  GIT_TAG origin/main
+  UPDATE_DISCONNECTED ON
+  SOURCE_SUBDIR somePathThatNeverExists)
 
 FetchContent_GetProperties(excel_filler)
-if (NOT excel_filler_POPULATED)
-    FetchContent_MakeAvailable(excel_filler)
-endif ()
+if(NOT excel_filler_POPULATED)
+  FetchContent_MakeAvailable(excel_filler)
+endif()
 
-if (NOT TARGET project_options)
-    add_library(project_options INTERFACE)
-endif ()
-if (NOT TARGET project_warnings)
-    add_library(project_warnings INTERFACE)
-endif ()
+if(NOT TARGET project_options)
+  add_library(project_options INTERFACE)
+endif()
+if(NOT TARGET project_warnings)
+  add_library(project_warnings INTERFACE)
+endif()
 ```
 
 and then include it in your `CMakeLists.txt`
@@ -129,7 +127,7 @@ add_subdirectory(${excel_filler_SOURCE_DIR}/Source/ExcelFiller ${excel_filler_BI
 Note that if you follow the same `CMake` setup your `INTERFACE` targets `project_options` and `project_warnings` are also applied to `ExcelFiller`.
 If you do not have these targets they are defined as empty interfaces.
 
-The finding of `fmt`, `pugixml`, `spdlog` and [kuba-- zip](https://github.com/kuba--/zip "zip") has to be done on the consuming project in this case.
+The finding of `fmt`, `pugixml` and `ZipCpp` has to be done on the consuming project in this case.
 
 Notes
 -----
