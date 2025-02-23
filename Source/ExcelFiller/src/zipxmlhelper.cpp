@@ -73,15 +73,12 @@ void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi
     xml_memory_writer counter;
     doc.save(counter, "", format, encoding);
 
-    // allocate necessary size (+1 for null termination)
-    ZipCpp::MemoryBuffer buffer(counter.result_ + 1);
+    // allocate necessary size (null termination not needed for std::byte)
+    ZipCpp::MemoryBuffer buffer(counter.result_);
 
     // second pass: actual printing
     xml_memory_writer writer(buffer.getData().data(), counter.result_);
     doc.save(writer, "", format, encoding);
-
-    // null terminate
-    buffer.getData().back() = std::byte{0};
 
     archive_.add(file, std::move(buffer));
 }
