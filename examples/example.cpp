@@ -7,7 +7,7 @@
 #include <spdlog/stopwatch.h>
 #include <string_view>
 #include <unistd.h>
-
+#include <limits>
 
 using Results = std::vector<::ExcelFiller::CellValueDoubles>;
 Results createRandomValues(const std::size_t rows, const std::size_t columns)
@@ -23,7 +23,21 @@ Results createRandomValues(const std::size_t rows, const std::size_t columns)
     {
         for (std::size_t j = 1; j <= columns; ++j)
         {
-            values.emplace_back(i, j, dis(gen));
+            auto value = [i, j, randomValue = dis(gen)]() {
+                if (i > j)
+                {
+                    return std::numeric_limits<double>::quiet_NaN();
+                }
+                else if (i < j)
+                {
+                    return std::numeric_limits<double>::infinity();
+                }
+                else
+                {
+                    return randomValue;
+                }
+            }();
+            values.emplace_back(i, j, value);
         }
     }
     return values;
@@ -104,13 +118,15 @@ int main()
 
         const std::string targetFilename{"example_filled.xlsx"};
         spdlog::stopwatch swAll;
-        std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
+        {
+            std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
 
-        ExcelFiller::XlsxWorkbook wb(targetFilename);
-        writeSheet(wb, "Sheet1", createRandomValues(2, 2));
-        writeSheet(wb, "Sheet2", createStrings(2, 2));
-        writeSheet(wb, "Sheet3", createVariants(2, 2));
-        wb.writeSharedStringTable();
+            ExcelFiller::XlsxWorkbook wb(targetFilename);
+            writeSheet(wb, "Sheet1", createRandomValues(2, 2));
+            writeSheet(wb, "Sheet2", createStrings(2, 2));
+            writeSheet(wb, "Sheet3", createVariants(2, 2));
+            wb.writeSharedStringTable();
+        }
         spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
         return 0;
     }

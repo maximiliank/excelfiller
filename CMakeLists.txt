@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EBA_EXAMPLE "Build EBA template filling example" OFF)
 
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)

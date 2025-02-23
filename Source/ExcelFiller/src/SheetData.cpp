@@ -1,6 +1,8 @@
 #include "ExcelFiller/SheetData.h"
 #include <fmt/format.h>
 #include <string_view>
+#include <spdlog/spdlog.h>
+#include <cmath>
 
 ExcelFiller::SheetData::SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable)
     : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)
@@ -66,6 +68,71 @@ namespace ExcelFiller {
             }
             return node;
         }
+        std::string_view getCellRef(const pugi::xml_node& cell)
+        {
+            if (auto attr = cell.attribute("r"); !attr.empty())
+            {
+                return attr.value();
+            }
+            else
+            {
+                return "Unknown cell";
+            }
+        }
+        void handleAttributeTypeChangeWarning(
+                const pugi::xml_node& cell, std::string_view currentAttribute, std::string_view newAttribute)
+        {
+            if (newAttribute != "e")
+            {
+                spdlog::warn("Changing attribute type of cell {} from {} to {}", getCellRef(cell), currentAttribute,
+                        newAttribute);
+            }
+        }
+        void setAttribute(pugi::xml_node& cell, const char* attributeType)
+        {
+            pugi::xml_attribute attr = cell.attribute("t");
+
+            if (!attr.empty())
+            {
+                if (const char* currentAttribute = attr.value(); std::strcmp(currentAttribute, attributeType) != 0)
+                {
+                    handleAttributeTypeChangeWarning(cell, currentAttribute, attributeType);
+                    attr.set_value(attributeType);
+                }
+            }
+            else if (std::strcmp(attributeType, "n") != 0)
+            {
+                // Only add the attribute if newValue is NOT "n"
+                handleAttributeTypeChangeWarning(cell, "n", attributeType);
+                cell.append_attribute("t").set_value(attributeType);
+            }
+        }
+        void setDoubleCellValue(pugi::xml_node& cell, double value)
+        {
+            auto valueNode = getValueNode(cell);
+            if (!std::isfinite(value))
+            {
+                const auto cellRef = getCellRef(cell);
+                setAttribute(cell, "e");
+                if (std::isinf(value))
+                {
+                    // +-Infinity -> #DIV/0! (Excel error)
+                    spdlog::warn("Setting infinity value in cell {}", cellRef);
+                    valueNode.text() = "#DIV/0!";
+                }
+                else
+                {
+                    // NaN -> #N/A (Excel error)
+                    spdlog::warn("Setting NaN value in cell {}", cellRef);
+                    valueNode.text() = "#N/A";
+                }
+            }
+            else
+            {
+                setAttribute(cell, "n");
+                valueNode.text() = value;
+            }
+        }
     } // namespace
 } // namespace ExcelFiller
 void ExcelFiller::ColumnProxy::setValue(
@@ -81,20 +148,7 @@ void ExcelFiller::ColumnProxy::setValue(
         }
     }
 
-    auto valueNode = [this]() {
-        auto node = currentColumn_.find_child([](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
-
-        if (node.empty())
-        {
-            node = currentColumn_.append_child("v");
-        }
-        return node;
-    }();
-    if (auto attr = currentColumn_.attribute("t"); !attr.empty())
-    {
-        attr.set_value("n");
-    }
-    valueNode.text() = value;
+    setDoubleCellValue(currentColumn_, value);
 }
 void ExcelFiller::ColumnProxy::setValue(
         std::size_t column, const std::string& value, SharedStringTable& sharedStringTable)
@@ -114,14 +168,7 @@ void ExcelFiller::ColumnProxy::setValue(
         }
     }
 
-    if (auto attr = currentColumn_.attribute("t"); !attr.empty())
-    {
-        attr.set_value("s");
-    }
-    else
-    {
-        currentColumn_.append_attribute("t").set_value("s");
-    }
+    setAttribute(currentColumn_, "s");
 
     auto valueNode = getValueNode(currentColumn_);
 
