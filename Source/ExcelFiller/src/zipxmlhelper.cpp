@@ -1,6 +1,8 @@
 #include "ExcelFiller/zipxmlhelper.h"
+#include <ZipCpp/zipcpp_flags.hpp>
 #include <cstring>
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 ExcelFiller::ZipXMLHelper::ZipXMLHelper(const std::string& filename)
     : archive_(ZipCpp::ZipArchive::open(filename, ZipCpp::LibZipOpen::RDONLY)), filename_(filename)
@@ -73,7 +75,6 @@ void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi
 
     // allocate necessary size (+1 for null termination)
     ZipCpp::MemoryBuffer buffer(counter.result_ + 1);
-    //auto buffer = std::make_unique<std::byte[]>(counter.result_ + 1);
 
     // second pass: actual printing
     xml_memory_writer writer(buffer.getData().data(), counter.result_);
@@ -83,14 +84,17 @@ void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi
     buffer.getData().back() = std::byte{0};
 
     archive_.add(file, std::move(buffer));
-
+}
+void ExcelFiller::ZipXMLHelper::saveArchive()
+{
+    // Reopen in read only mode to trigger zip_close in case there was a modification
     reopenFile(ZipCpp::LibZipOpen::RDONLY);
 }
-
 void ExcelFiller::ZipXMLHelper::reopenFile(ZipCpp::LibZipOpen flags)
 {
     if (archive_.getCurrentFlags() != flags)
     {
+        spdlog::debug("Reopening archive with flags {}", flags);
         archive_ = ZipCpp::ZipArchive::open(filename_, flags);
     }
 }

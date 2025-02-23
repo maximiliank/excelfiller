@@ -7,6 +7,7 @@
 #include <spdlog/stopwatch.h>
 #include <string_view>
 #include <unistd.h>
+#include <limits>
 
 
 using Results = std::vector<::ExcelFiller::CellValueDoubles>;
@@ -23,7 +24,21 @@ Results createRandomValues(const std::size_t rows, const std::size_t columns)
     {
         for (std::size_t j = 1; j <= columns; ++j)
         {
-            values.emplace_back(i, j, dis(gen));
+            auto value = [i, j, randomValue = dis(gen)]() {
+                if (i > j)
+                {
+                    return std::numeric_limits<double>::quiet_NaN();
+                }
+                else if (i < j)
+                {
+                    return std::numeric_limits<double>::infinity();
+                }
+                else
+                {
+                    return randomValue;
+                }
+            }();
+            values.emplace_back(i, j, value);
         }
     }
     return values;
@@ -111,6 +126,9 @@ int main()
         writeSheet(wb, "Sheet2", createStrings(2, 2));
         writeSheet(wb, "Sheet3", createVariants(2, 2));
         wb.writeSharedStringTable();
+        spdlog::stopwatch swSaving;
+        wb.saveArchive();
+        spdlog::info("Saving zip archive {} in {:.4} seconds", targetFilename, swSaving);
         spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
         return 0;
     }

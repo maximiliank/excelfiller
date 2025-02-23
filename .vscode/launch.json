@@ -14,13 +14,13 @@
         },
         {
 
-            "name": "(gdb) Launch",
+            "name": "EBA Benchmark",
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
             "args": [ ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/out/build/unixlike-gcc-release/examples/EBAbenchmark",
+            "cwd": "${workspaceFolder}/out/build/${command:cmake.activeConfigurePresetName}/examples/EBAbenchmark",
             "environment": [ ],
             "externalConsole": false,
             "MIMode": "gdb",

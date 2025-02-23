@@ -71,24 +71,29 @@ void writeExcel(const std::string& filenameOriginal, const std::string& targetFi
         const ExcelFiller::HashMap<std::string, std::vector<CellValue>>& targets)
 {
     spdlog::stopwatch swAll;
-    std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
-
-    ExcelFiller::XlsxWorkbook wb(targetFilename);
-
-    for (const auto& [sheetName, cells] : targets)
     {
-        spdlog::stopwatch sw;
+        std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
 
-        auto sheet = wb.getWorksheet(sheetName);
-        auto sheetData = sheet.getSheetData();
+        ExcelFiller::XlsxWorkbook wb(targetFilename);
 
-        for (const auto& cell : cells)
+        for (const auto& [sheetName, cells] : targets)
         {
-            sheetData.setValue(cell.row_, cell.column_, cell.value_);
-        }
-        sheet.save();
+            spdlog::stopwatch sw;
 
-        spdlog::info("Wrote {} cells to sheet {} in {:.4} seconds.", cells.size(), sheetName, sw);
+            auto sheet = wb.getWorksheet(sheetName);
+            auto sheetData = sheet.getSheetData();
+
+            for (const auto& cell : cells)
+            {
+                sheetData.setValue(cell.row_, cell.column_, cell.value_);
+            }
+            sheet.save();
+
+            spdlog::info("Wrote {} cells to sheet {} in {:.4} seconds.", cells.size(), sheetName, sw);
+        }
+        spdlog::stopwatch swSaving;
+        wb.saveArchive();
+        spdlog::info("Saving zip archive {} in {:.4} seconds", targetFilename, swSaving);
     }
     spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
 }

@@ -18,5 +18,7 @@ namespace ExcelFiller {
         [[nodiscard]] pugi::xml_document loadXMLFile(const std::string& file);
 
         void writeXMLFile(const std::string& file, const pugi::xml_document& doc);
+
+        void saveArchive();
     };
 } // namespace ExcelFiller
