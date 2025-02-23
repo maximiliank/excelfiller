@@ -119,16 +119,18 @@ int main()
 
         const std::string targetFilename{"example_filled.xlsx"};
         spdlog::stopwatch swAll;
-        std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
+        {
+            std::filesystem::copy(filenameOriginal, targetFilename, std::filesystem::copy_options::overwrite_existing);
 
-        ExcelFiller::XlsxWorkbook wb(targetFilename);
-        writeSheet(wb, "Sheet1", createRandomValues(2, 2));
-        writeSheet(wb, "Sheet2", createStrings(2, 2));
-        writeSheet(wb, "Sheet3", createVariants(2, 2));
-        wb.writeSharedStringTable();
-        spdlog::stopwatch swSaving;
-        wb.saveArchive();
-        spdlog::info("Saving zip archive {} in {:.4} seconds", targetFilename, swSaving);
+            ExcelFiller::XlsxWorkbook wb(targetFilename);
+            writeSheet(wb, "Sheet1", createRandomValues(2, 2));
+            writeSheet(wb, "Sheet2", createStrings(2, 2));
+            writeSheet(wb, "Sheet3", createVariants(2, 2));
+            wb.writeSharedStringTable();
+            spdlog::stopwatch swSaving;
+            wb.saveArchive();
+            spdlog::info("Saving zip archive {} in {:.4} seconds", targetFilename, swSaving);
+        }
         spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
         return 0;
     }
