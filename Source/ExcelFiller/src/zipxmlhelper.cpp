@@ -1,5 +1,6 @@
 #include "ExcelFiller/zipxmlhelper.h"
 #include <ZipCpp/zipcpp_flags.hpp>
+#include <ZipCpp/zipcompression.h>
 #include <cstring>
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
@@ -64,6 +65,7 @@ namespace ExcelFiller {
 } // namespace ExcelFiller
 void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi::xml_document& doc)
 {
+    static const ZipCpp::ZipCompression compression(ZipCpp::ZipCompression::Algorithm::Deflate, std::uint32_t{5});
     const auto format = pugi::format_raw | pugi::format_save_file_text | pugi::format_no_escapes;
     const auto encoding = pugi::encoding_utf8;
 
@@ -80,7 +82,7 @@ void ExcelFiller::ZipXMLHelper::writeXMLFile(const std::string& file, const pugi
     xml_memory_writer writer(buffer.getData().data(), counter.result_);
     doc.save(writer, "", format, encoding);
 
-    archive_.add(file, std::move(buffer));
+    archive_.add(file, std::move(buffer), compression);
 }
 void ExcelFiller::ZipXMLHelper::saveArchive()
 {
