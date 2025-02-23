@@ -11,6 +11,7 @@ namespace ExcelFiller {
 
       public:
         using ZipXMLHelper::writeXMLFile;
+        using ZipXMLHelper::saveArchive;
 
         explicit XlsxWorkbook(const std::string& filename);
 

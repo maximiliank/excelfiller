@@ -1,27 +1,24 @@
 #pragma once
 #include <pugixml.hpp>
 #include <string>
+#include <ZipCpp/zipcpp.h>
 
-struct zip_t;
 namespace ExcelFiller {
     class ZipXMLHelper {
-        char mode_;
-        struct zip_t* zip_ = nullptr;
+        ZipCpp::ZipArchive archive_;
         std::string filename_;
 
-        static zip_t* openArchive(const char* zipname, int level, char mode);
-        void reopenFile(int level, char mode);
-        void close();
+        void reopenFile(ZipCpp::LibZipOpen flags);
 
       public:
         explicit ZipXMLHelper(const std::string& filename);
-
-        ~ZipXMLHelper();
 
       protected:
         [[nodiscard]] bool hasFile(const std::string& file) const;
         [[nodiscard]] pugi::xml_document loadXMLFile(const std::string& file);
 
         void writeXMLFile(const std::string& file, const pugi::xml_document& doc);
+
+        void saveArchive();
     };
 } // namespace ExcelFiller

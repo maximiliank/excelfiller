@@ -1,8 +1,8 @@
 #include "ExcelFiller/SheetData.h"
+#include <cmath>
 #include <fmt/format.h>
 #include <string_view>
 #include <spdlog/spdlog.h>
-#include <cmath>
 
 ExcelFiller::SheetData::SheetData(pugi::xml_node data, SharedStringTable& sharedStringTable)
     : data_(data), rowProxy_(data_.first_child()), sharedStringTable_(sharedStringTable)

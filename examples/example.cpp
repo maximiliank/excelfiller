@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <limits>
 
+
 using Results = std::vector<::ExcelFiller::CellValueDoubles>;
 Results createRandomValues(const std::size_t rows, const std::size_t columns)
 {
@@ -126,6 +127,9 @@ int main()
             writeSheet(wb, "Sheet2", createStrings(2, 2));
             writeSheet(wb, "Sheet3", createVariants(2, 2));
             wb.writeSharedStringTable();
+            spdlog::stopwatch swSaving;
+            wb.saveArchive();
+            spdlog::info("Saving zip archive {} in {:.4} seconds", targetFilename, swSaving);
         }
         spdlog::info("Wrote excel file {} in {:.4} seconds.", targetFilename, swAll);
         return 0;

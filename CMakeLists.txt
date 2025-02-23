@@ -28,7 +28,9 @@ set_project_warnings(project_warnings)
 
 excelfiller_setup_dependencies()
 
-# https://github.com/kuba--/zip add_subdirectory(Source/zip)
+include(cmake/ZipCpp.cmake)
+add_subdirectory(${zip_cpp_SOURCE_DIR}/Source/ZipCpp ${zip_cpp_BINARY_DIR}_zip_cpp)
+
 add_subdirectory(Source/ExcelFiller)
 
 if(BUILD_EXAMPLES)
