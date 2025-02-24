@@ -94,6 +94,7 @@ void ExcelFiller::ZipXMLHelper::reopenFile(ZipCpp::LibZipOpen flags)
     if (archive_.getCurrentFlags() != flags)
     {
         spdlog::debug("Reopening archive with flags {}", flags);
+        archive_.writeAndClose();
         archive_ = ZipCpp::ZipArchive::open(filename_, flags);
     }
 }
