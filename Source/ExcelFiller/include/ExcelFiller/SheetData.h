@@ -20,6 +20,8 @@ namespace ExcelFiller {
 
         void setValue(std::size_t column, const std::string& value, SharedStringTable& sharedStringTable);
 
+        void setValue(std::size_t column, EmptyCell value, SharedStringTable& sharedStringTable);
+
         void setValue(std::size_t column, const CellVariants& value, SharedStringTable& sharedStringTable);
     };
 

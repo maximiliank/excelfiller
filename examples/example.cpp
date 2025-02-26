@@ -75,8 +75,13 @@ std::vector<::ExcelFiller::CellValue<::ExcelFiller::CellVariants>> createVariant
     {
         for (std::size_t j = 1; j <= columns; ++j)
         {
-            if (i == j)
+            if (i == 1)
             {
+                ret.emplace_back(i, j, ExcelFiller::EmptyCell{});
+            }
+            else if (i == j)
+            {
+
                 ret.emplace_back(i, j, static_cast<double>(i + j));
             }
             else

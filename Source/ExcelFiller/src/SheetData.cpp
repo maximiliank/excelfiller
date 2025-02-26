@@ -1,4 +1,6 @@
 #include "ExcelFiller/SheetData.h"
+#include "ExcelFiller/concepts.hpp"
+#include "ExcelFiller/zipxmlhelper.h"
 #include <cmath>
 #include <fmt/format.h>
 #include <string_view>
@@ -57,16 +59,26 @@ namespace ExcelFiller {
             }
             return str;
         };
-
+        pugi::xml_node findValueNode(pugi::xml_node item)
+        {
+            return item.find_child([](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
+        }
         pugi::xml_node getValueNode(pugi::xml_node item)
         {
-            auto node = item.find_child([](pugi::xml_node cell) { return strcmp(cell.name(), "v") == 0; });
+            auto node = findValueNode(item);
 
             if (node.empty())
             {
                 node = item.append_child("v");
             }
             return node;
+        }
+        void deleteValueNode(pugi::xml_node item)
+        {
+            if (auto node = findValueNode(item); !node.empty())
+            {
+                item.remove_child(node);
+            }
         }
         std::string_view getCellRef(const pugi::xml_node& cell)
         {
@@ -133,41 +145,36 @@ namespace ExcelFiller {
                 valueNode.text() = value;
             }
         }
+
+        void findCell(pugi::xml_node& currentColumn, std::size_t column, const std::string& rowStr)
+        {
+            const auto cellRef = toBase26(column) + rowStr;
+            while (std::string_view{currentColumn.attribute("r").value()} != cellRef)
+            {
+                currentColumn = currentColumn.next_sibling();
+                if (currentColumn.empty())
+                {
+                    throw std::runtime_error(fmt::format("Could not find column {}", column));
+                }
+            }
+        }
     } // namespace
 } // namespace ExcelFiller
 void ExcelFiller::ColumnProxy::setValue(
-        std::size_t column, double value, [[maybe_unused]] SharedStringTable& sharedStringTable)
+        const std::size_t column, const double value, [[maybe_unused]] SharedStringTable& sharedStringTable)
 {
-    const auto cellRef = toBase26(column) + rowStr_;
-    while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
-    {
-        currentColumn_ = currentColumn_.next_sibling();
-        if (currentColumn_.empty())
-        {
-            throw std::runtime_error(fmt::format("Could not find column {}", column));
-        }
-    }
-
+    findCell(currentColumn_, column, rowStr_);
     setDoubleCellValue(currentColumn_, value);
 }
 void ExcelFiller::ColumnProxy::setValue(
-        std::size_t column, const std::string& value, SharedStringTable& sharedStringTable)
+        const std::size_t column, const std::string& value, SharedStringTable& sharedStringTable)
 {
     setValue(column, std::string_view{value}, sharedStringTable);
 }
 void ExcelFiller::ColumnProxy::setValue(
-        std::size_t column, const std::string_view value, SharedStringTable& sharedStringTable)
+        const std::size_t column, const std::string_view value, SharedStringTable& sharedStringTable)
 {
-    const auto cellRef = toBase26(column) + rowStr_;
-    while (std::string_view{currentColumn_.attribute("r").value()} != cellRef)
-    {
-        currentColumn_ = currentColumn_.next_sibling();
-        if (currentColumn_.empty())
-        {
-            throw std::runtime_error(fmt::format("Could not find column {}", column));
-        }
-    }
-
+    findCell(currentColumn_, column, rowStr_);
     setAttribute(currentColumn_, "s");
 
     auto valueNode = getValueNode(currentColumn_);
@@ -176,6 +183,12 @@ void ExcelFiller::ColumnProxy::setValue(
     valueNode.text() = idx;
 }
 
+void ExcelFiller::ColumnProxy::setValue(std::size_t column, [[maybe_unused]] const EmptyCell value,
+        [[maybe_unused]] SharedStringTable& sharedStringTable)
+{
+    findCell(currentColumn_, column, rowStr_);
+    deleteValueNode(currentColumn_);
+}
 
 void ExcelFiller::ColumnProxy::setValue(
         std::size_t column, const CellVariants& value, SharedStringTable& sharedStringTable)

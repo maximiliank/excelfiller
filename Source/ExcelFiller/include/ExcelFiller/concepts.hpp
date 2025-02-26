@@ -6,12 +6,14 @@
 #include <variant>
 
 namespace ExcelFiller {
-    using CellVariants = std::variant<double, std::string, std::string_view>;
+    struct EmptyCell {};
+    using CellVariants = std::variant<double, std::string, std::string_view, EmptyCell>;
 }
 namespace ExcelFiller::Concepts {
     template<typename T>
-    concept CellConcept = std::same_as<T, double> or std::same_as<T, std::string> or
-                          std::same_as<T, std::string_view> or std::same_as<T, CellVariants>;
+    concept CellConcept =
+            std::same_as<T, double> || std::same_as<T, std::string> || std::same_as<T, std::string_view> ||
+            std::same_as<T, EmptyCell> || std::same_as<T, CellVariants>;
 
 } // namespace ExcelFiller::Concepts
 namespace ExcelFiller {
@@ -24,5 +26,6 @@ namespace ExcelFiller {
     using CellValueVariants = CellValue<CellVariants>;
     using CellValueDoubles = CellValue<double>;
     using CellValueStrings = CellValue<std::string>;
+    using CellValuesEmpty = CellValue<EmptyCell>;
 
 } // namespace ExcelFiller
